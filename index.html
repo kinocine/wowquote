@@ -3,17 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>영화 리뷰 카드뉴스 & 포스터 메이커 | CineQuote Studio</title>
-  <!-- Tailwind CSS CDN -->
+  <title>CineQuote Studio - 영화 리뷰 카드뉴스 & 포스터 메이커</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts: Pretendard alternative & Cinzel / Noto Serif for theatrical touch -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800;900&family=Noto+Sans+KR:wght@300;400;500;700;900&family=Noto+Serif+KR:wght@500;700;900&display=swap" rel="stylesheet">
-  <!-- JSZip & FileSaver for bulk zip packaging -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-  <!-- Lucide Icons (Vanilla) -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <script>
@@ -33,11 +29,12 @@
               600: '#d97706',
             },
             cinema: {
-              900: '#0c0e12',
-              850: '#12161f',
-              800: '#181d28',
-              700: '#232938',
-              600: '#333b4e',
+              950: '#080a0f',
+              900: '#0f131a',
+              850: '#151b26',
+              800: '#1c2433',
+              700: '#2a354b',
+              600: '#3a4964',
             }
           }
         }
@@ -45,172 +42,167 @@
     }
   </script>
   <style>
-    /* Custom scrollbars */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #0c0e12;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #333b4e;
-      border-radius: 3px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #f59e0b;
-    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0b0e14; }
+    ::-webkit-scrollbar-thumb { background: #2a354b; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #fbbf24; }
     .checkered-bg {
-      background-color: #12161f;
-      background-image: linear-gradient(45deg, #181d28 25%, transparent 25%), 
-                        linear-gradient(-45deg, #181d28 25%, transparent 25%), 
-                        linear-gradient(45deg, transparent 75%, #181d28 75%), 
-                        linear-gradient(-45deg, transparent 75%, #181d28 75%);
+      background-color: #10151f;
+      background-image: linear-gradient(45deg, #171e2c 25%, transparent 25%), 
+                        linear-gradient(-45deg, #171e2c 25%, transparent 25%), 
+                        linear-gradient(45deg, transparent 75%, #171e2c 75%), 
+                        linear-gradient(-45deg, transparent 75%, #171e2c 75%);
       background-size: 20px 20px;
       background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
     }
   </style>
 </head>
-<body class="bg-cinema-900 text-gray-100 font-sans min-h-screen flex flex-col antialiased selection:bg-gold-500 selection:text-black">
+<body class="bg-cinema-950 text-gray-100 font-sans min-h-screen flex flex-col antialiased selection:bg-gold-500 selection:text-black">
 
-  <header class="border-b border-cinema-700/80 bg-cinema-850/90 backdrop-blur sticky top-0 z-40 px-4 lg:px-8 py-3.5 flex items-center justify-between shadow-xl">
+  <header class="border-b border-cinema-700/80 bg-cinema-900/95 backdrop-blur sticky top-0 z-40 px-4 lg:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3 shadow-xl">
     <div class="flex items-center gap-3">
-      <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-gold-400 to-amber-600 flex items-center justify-center text-black font-black text-xl shadow-lg shadow-gold-500/20">
+      <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-gold-400 to-amber-600 flex items-center justify-center text-black font-black shadow-md shadow-gold-500/20 flex-shrink-0">
         <i data-lucide="clapperboard" class="w-5 h-5"></i>
       </div>
       <div>
         <div class="flex items-center gap-2">
-          <h1 class="text-base lg:text-lg font-bold tracking-tight text-white flex items-center gap-1.5">
-            CineQuote <span class="text-xs px-2 py-0.5 rounded-full bg-gold-500/20 text-gold-400 font-medium border border-gold-500/30">PRO</span>
-          </h1>
-          <span class="text-xs text-gray-400 hidden sm:inline">| 영화 리뷰 카드뉴스 & 포스터 제작기</span>
+          <span class="text-base font-extrabold text-white tracking-tight">CineQuote</span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-gold-500/20 text-gold-400 font-bold border border-gold-500/30">PRO v2.0</span>
+          <span id="saveStatusBadge" class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
+            <i data-lucide="check" class="w-3 h-3"></i> 브라우저 자동 저장됨
+          </span>
         </div>
-        <p class="text-[11px] text-gray-400 hidden md:block">스틸컷 N장과 기자 리뷰 문구를 1000px 이상의 고화질 마케팅 포스터로 일괄 변환</p>
       </div>
     </div>
 
-    <div class="flex items-center gap-2.5">
-      <button id="btnLoadSample" class="px-3 py-1.5 text-xs font-medium text-amber-300 bg-amber-950/40 hover:bg-amber-900/60 border border-amber-600/40 rounded-md transition flex items-center gap-1.5">
-        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-        <span>샘플 데이터 로드</span>
+    <!-- Top Center Project Movie Title Input -->
+    <div class="flex-1 max-w-md min-w-[240px] flex items-center gap-2 bg-cinema-850 px-3 py-1.5 rounded-lg border border-cinema-700/90 focus-within:border-gold-400">
+      <i data-lucide="film" class="w-4 h-4 text-gold-400 flex-shrink-0"></i>
+      <div class="flex-1">
+        <span class="text-[10px] text-gray-400 block font-medium">프로젝트 / 영화 타이틀 (파일명 반영)</span>
+        <input type="text" id="topMovieTitle" value="타짜: 벨제붑의 노래" class="w-full bg-transparent text-xs font-bold text-white focus:outline-none placeholder-gray-500">
+      </div>
+    </div>
+
+    <!-- Top Action Buttons: Folder Picker, ZIP, Single -->
+    <div class="flex items-center gap-2 flex-wrap">
+      <!-- Folder target button for C:/wowquote style direct save -->
+      <button id="btnSetDirectory" class="px-2.5 py-1.5 text-xs font-medium text-emerald-300 bg-emerald-950/40 hover:bg-emerald-900/60 border border-emerald-600/40 rounded-lg transition flex items-center gap-1.5" title="내 PC 로컬 폴더(예: C:/wowquote)를 연결하여 원클릭 자동 저장">
+        <i data-lucide="folder-cog" class="w-3.5 h-3.5"></i>
+        <span id="dirNameDisplay">로컬 폴더 지정 (C:/wowquote)</span>
       </button>
-      <button id="btnDownloadSingle" class="px-3.5 py-1.5 text-xs font-semibold text-white bg-cinema-700 hover:bg-cinema-600 border border-cinema-600 rounded-md transition flex items-center gap-1.5">
+
+      <button id="btnSaveToDir" class="hidden px-2.5 py-1.5 text-xs font-bold text-emerald-900 bg-emerald-400 hover:bg-emerald-300 rounded-lg transition flex items-center gap-1 shadow-sm">
+        <i data-lucide="folder-down" class="w-3.5 h-3.5"></i>
+        <span>폴더에 바로 저장</span>
+      </button>
+
+      <button id="btnDownloadSingle" class="px-2.5 py-1.5 text-xs font-semibold text-white bg-cinema-800 hover:bg-cinema-700 border border-cinema-600 rounded-lg transition flex items-center gap-1.5">
         <i data-lucide="download" class="w-3.5 h-3.5"></i>
-        <span>현재 카드 (PNG)</span>
+        <span>현재 카드</span>
       </button>
-      <button id="btnDownloadAllZip" class="px-3.5 py-1.5 text-xs font-bold text-black bg-gradient-to-r from-gold-400 to-amber-500 hover:brightness-110 rounded-md transition flex items-center gap-1.5 shadow-md shadow-gold-500/20">
+
+      <button id="btnDownloadAllZip" class="px-3 py-1.5 text-xs font-bold text-black bg-gradient-to-r from-gold-400 to-amber-500 hover:brightness-110 rounded-lg transition flex items-center gap-1.5 shadow-md shadow-gold-500/20">
         <i data-lucide="archive" class="w-3.5 h-3.5"></i>
-        <span>전체 일괄 다운로드 (ZIP)</span>
+        <span>전체 일괄 ZIP</span>
       </button>
     </div>
   </header>
 
   <main class="flex-1 flex flex-col lg:flex-row overflow-hidden">
     
-    <!-- LEFT PANEL: Data Input & Styling Controller -->
-    <aside class="w-full lg:w-[460px] xl:w-[500px] border-r border-cinema-700 bg-cinema-850 flex flex-col h-[55vh] lg:h-[calc(100vh-61px)] overflow-y-auto">
+    <!-- LEFT PANEL: Cards Management, Quotes, Styling -->
+    <aside class="w-full lg:w-[480px] xl:w-[520px] border-r border-cinema-700/80 bg-cinema-900 flex flex-col h-[52vh] lg:h-[calc(100vh-63px)]">
       
-      <!-- Tab Bar -->
-      <div class="flex border-b border-cinema-700 bg-cinema-900/60 sticky top-0 z-20">
-        <button id="tabBtnInput" class="flex-1 py-3 text-xs font-bold border-b-2 border-gold-400 text-gold-400 flex items-center justify-center gap-1.5 transition">
-          <i data-lucide="layers" class="w-3.5 h-3.5"></i> 1. 이미지 & 문구 일괄 입력
+      <!-- Tab Navigation -->
+      <div class="flex border-b border-cinema-700 bg-cinema-950/80 sticky top-0 z-20">
+        <button id="tabBtnCards" class="flex-1 py-2.5 text-xs font-bold border-b-2 border-gold-400 text-gold-400 flex items-center justify-center gap-1.5 transition">
+          <i data-lucide="list-ordered" class="w-3.5 h-3.5"></i> 1. 카드 관리 & 순서
         </button>
-        <button id="tabBtnStyle" class="flex-1 py-3 text-xs font-semibold border-b-2 border-transparent text-gray-400 hover:text-gray-200 flex items-center justify-center gap-1.5 transition">
-          <i data-lucide="sliders" class="w-3.5 h-3.5"></i> 2. 포스터 디자인 & 레이아웃
+        <button id="tabBtnBatch" class="flex-1 py-2.5 text-xs font-semibold border-b-2 border-transparent text-gray-400 hover:text-gray-200 flex items-center justify-center gap-1.5 transition">
+          <i data-lucide="file-text" class="w-3.5 h-3.5"></i> 2. 문구·스틸 일괄 추가
+        </button>
+        <button id="tabBtnStyle" class="flex-1 py-2.5 text-xs font-semibold border-b-2 border-transparent text-gray-400 hover:text-gray-200 flex items-center justify-center gap-1.5 transition">
+          <i data-lucide="palette" class="w-3.5 h-3.5"></i> 3. 디자인 스타일
         </button>
       </div>
 
-      <div id="tabContentInput" class="p-4 sm:p-5 space-y-6">
+      <!-- TAB 1: Real-time Card Manager with Search & Reordering -->
+      <div id="tabContentCards" class="flex-1 overflow-y-auto p-4 space-y-4">
         
-        <!-- Aspect Ratio Selection -->
-        <div class="bg-cinema-800/70 p-3.5 rounded-xl border border-cinema-700/80">
-          <label class="text-xs font-bold text-gray-300 block mb-2 flex items-center justify-between">
-            <span class="flex items-center gap-1.5">
-              <i data-lucide="aspect-ratio" class="w-3.5 h-3.5 text-gold-400"></i> 규격 / 비율 선택
+        <!-- Search & Quick Action Bar -->
+        <div class="space-y-2">
+          <div class="flex items-center gap-2">
+            <div class="relative flex-1">
+              <i data-lucide="search" class="w-3.5 h-3.5 text-gray-400 absolute left-3 top-2.5"></i>
+              <input type="text" id="searchInput" placeholder="리뷰 문구 또는 기자명 검색..." class="w-full bg-cinema-850 border border-cinema-700 rounded-lg pl-8 pr-3 py-1.5 text-xs text-white focus:border-gold-400 focus:outline-none placeholder-gray-500">
+            </div>
+            <button id="btnAddNewCard" class="px-2.5 py-1.5 text-xs font-semibold text-gold-300 bg-gold-500/15 hover:bg-gold-500/25 border border-gold-500/40 rounded-lg flex items-center gap-1 flex-shrink-0">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i> 새 카드 추가
+            </button>
+          </div>
+          <div class="flex items-center justify-between text-[11px] text-gray-400 px-1">
+            <span id="filteredCardCount">총 5개의 카드</span>
+            <span class="text-amber-400/90 font-medium">▲ ▼ 버튼으로 포스터 순서 변경 가능</span>
+          </div>
+        </div>
+
+        <!-- Cards Accordion/List for Reorder, Edit, Delete -->
+        <div id="cardsListContainer" class="space-y-2.5">
+          <!-- Dynamically populated via JS -->
+        </div>
+
+      </div>
+
+      <!-- TAB 2: Batch Importer (Quotes & Multi-image Drop) -->
+      <div id="tabContentBatch" class="flex-1 overflow-y-auto p-4 space-y-4 hidden">
+        
+        <!-- Common Poster Meta Info -->
+        <div class="bg-cinema-850 p-3 rounded-xl border border-cinema-700/70 space-y-2.5">
+          <h3 class="text-xs font-bold text-gray-200 flex items-center gap-1.5">
+            <i data-lucide="layout-template" class="w-3.5 h-3.5 text-gold-400"></i> 포스터 공통 문구 설정
+          </h3>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <span class="text-[10px] text-gray-400 block mb-0.5">상단 영화제/헤드라인</span>
+              <input type="text" id="inputFestivalBadge" value="제51회 토론토국제영화제 공식 초청작" class="w-full bg-cinema-900 border border-cinema-700 rounded-md px-2 py-1 text-xs text-white focus:border-gold-400 focus:outline-none">
+            </div>
+            <div>
+              <span class="text-[10px] text-gray-400 block mb-0.5">하단 개봉 일정 및 크레딧</span>
+              <input type="text" id="inputMovieCredits" value="9월 23일 극장 대개봉 | 감독 최동훈 | 조승우 김혜수 백윤식" class="w-full bg-cinema-900 border border-cinema-700 rounded-md px-2 py-1 text-xs text-white focus:border-gold-400 focus:outline-none">
+            </div>
+          </div>
+        </div>
+
+        <!-- Multi Stills Dropzone -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-gray-300 flex items-center gap-1.5">
+              <i data-lucide="images" class="w-3.5 h-3.5 text-gold-400"></i> 영화 스틸컷 추가 업로드 (N장)
             </span>
-            <span id="resolutionBadge" class="text-[11px] font-mono text-gold-400/90 bg-gold-500/10 px-2 py-0.5 rounded border border-gold-500/20">1000 × 1500 px</span>
-          </label>
-          <div class="grid grid-cols-3 gap-2 text-xs">
-            <button data-ratio="poster" class="ratio-btn active border border-gold-400 bg-gold-400/15 text-white font-semibold py-2 px-2.5 rounded-lg flex flex-col items-center gap-1 transition">
-              <span class="w-4 h-6 border-2 border-gold-400 rounded-sm inline-block"></span>
-              <span>세로 포스터</span>
-              <span class="text-[10px] text-gray-400 font-normal">2:3 (1000×1500)</span>
-            </button>
-            <button data-ratio="square" class="ratio-btn border border-cinema-700 bg-cinema-900/60 text-gray-300 hover:text-white font-medium py-2 px-2.5 rounded-lg flex flex-col items-center gap-1 transition">
-              <span class="w-5 h-5 border-2 border-gray-400 rounded-sm inline-block"></span>
-              <span>SNS 정방형</span>
-              <span class="text-[10px] text-gray-400 font-normal">1:1 (1080×1080)</span>
-            </button>
-            <button data-ratio="landscape" class="ratio-btn border border-cinema-700 bg-cinema-900/60 text-gray-300 hover:text-white font-medium py-2 px-2.5 rounded-lg flex flex-col items-center gap-1 transition">
-              <span class="w-6 h-3.5 border-2 border-gray-400 rounded-sm inline-block"></span>
-              <span>가로 스틸형</span>
-              <span class="text-[10px] text-gray-400 font-normal">16:9 (1280×720)</span>
-            </button>
           </div>
-        </div>
-
-        <!-- Movie Header & Footer metadata -->
-        <div class="space-y-3 bg-cinema-800/70 p-3.5 rounded-xl border border-cinema-700/80">
-          <label class="text-xs font-bold text-gray-300 flex items-center gap-1.5">
-            <i data-lucide="film" class="w-3.5 h-3.5 text-gold-400"></i> 영화 정보 (공통 표시)
-          </label>
-          <div class="grid grid-cols-2 gap-2.5">
-            <div>
-              <span class="text-[11px] text-gray-400 block mb-1">상단 영화제/헤드라인</span>
-              <input type="text" id="inputFestivalBadge" value="제51회 토론토국제영화제 공식 초청작" class="w-full bg-cinema-900 border border-cinema-700 rounded-md px-2.5 py-1.5 text-xs text-white placeholder-gray-500 focus:border-gold-400 focus:outline-none" placeholder="예: 해외 유수 영화제 극찬!">
-            </div>
-            <div>
-              <span class="text-[11px] text-gray-400 block mb-1">영화 제목 (타이틀)</span>
-              <input type="text" id="inputMovieTitle" value="암살자(들)" class="w-full bg-cinema-900 border border-cinema-700 rounded-md px-2.5 py-1.5 text-xs text-white placeholder-gray-500 focus:border-gold-400 focus:outline-none" placeholder="예: 영화 제목">
-            </div>
-          </div>
-          <div>
-            <span class="text-[11px] text-gray-400 block mb-1">하단 개봉 정보 및 크레딧</span>
-            <input type="text" id="inputMovieCredits" value="9월 극장 대개봉 | 감독 허진호 | 유해진 박해일 이민호" class="w-full bg-cinema-900 border border-cinema-700 rounded-md px-2.5 py-1.5 text-xs text-white placeholder-gray-500 focus:border-gold-400 focus:outline-none" placeholder="개봉일 및 출연진 정보">
-          </div>
-        </div>
-
-        <!-- Bulk Image Upload -->
-        <div class="space-y-2">
-          <div class="flex items-center justify-between">
-            <label class="text-xs font-bold text-gray-300 flex items-center gap-1.5">
-              <i data-lucide="images" class="w-3.5 h-3.5 text-gold-400"></i> 영화 스틸컷 업로드 (N장)
-            </label>
-            <span id="imgCountBadge" class="text-[11px] text-gray-400">총 3장 등록됨</span>
-          </div>
-
-          <!-- Drag and Drop Zone -->
-          <div id="dropZone" class="border-2 border-dashed border-cinema-600 hover:border-gold-400 bg-cinema-900/50 hover:bg-cinema-800/40 rounded-xl p-4 text-center cursor-pointer transition flex flex-col items-center justify-center gap-2 group">
+          <div id="dropZone" class="border-2 border-dashed border-cinema-700 hover:border-gold-400 bg-cinema-850/60 hover:bg-cinema-850 rounded-xl p-4 text-center cursor-pointer transition flex flex-col items-center justify-center gap-1.5">
             <input type="file" id="imageInput" multiple accept="image/*" class="hidden">
-            <div class="w-10 h-10 rounded-full bg-cinema-800 flex items-center justify-center text-gray-400 group-hover:text-gold-400 group-hover:bg-gold-500/10 transition">
-              <i data-lucide="upload-cloud" class="w-5 h-5"></i>
-            </div>
-            <div>
-              <p class="text-xs font-medium text-gray-200">클릭하거나 스틸컷 이미지를 드래그하여 추가</p>
-              <p class="text-[11px] text-gray-500">JPG, PNG, WEBP (여러 장 동시 선택 가능)</p>
-            </div>
-          </div>
-
-          <!-- Thumbnails Strip -->
-          <div id="thumbStrip" class="flex gap-2 overflow-x-auto py-2 px-1">
-            <!-- Dynamically populated -->
+            <i data-lucide="upload-cloud" class="w-6 h-6 text-gold-400"></i>
+            <p class="text-xs font-medium text-gray-200">새 스틸컷들을 드래그하거나 클릭하여 추가</p>
+            <p class="text-[10px] text-gray-500">기존 카드 뒤에 추가되거나 이미지가 교체됩니다.</p>
           </div>
         </div>
 
-        <!-- Bulk Review Quotes Textarea -->
+        <!-- Textarea for Batch Review Texts -->
         <div class="space-y-2">
           <div class="flex items-center justify-between">
-            <label class="text-xs font-bold text-gray-300 flex items-center gap-1.5">
-              <i data-lucide="message-square-quote" class="w-3.5 h-3.5 text-gold-400"></i> 리뷰 문구 일괄 붙여넣기
-            </label>
-            <button id="btnParseReviews" class="text-[11px] text-gold-400 hover:underline flex items-center gap-1">
-              <i data-lucide="refresh-cw" class="w-3 h-3"></i> 즉시 반영
+            <span class="text-xs font-bold text-gray-300 flex items-center gap-1.5">
+              <i data-lucide="file-input" class="w-3.5 h-3.5 text-gold-400"></i> 리뷰 문구 일괄 붙여넣기
+            </span>
+            <button id="btnParseReviews" class="px-2.5 py-1 text-xs font-bold text-black bg-gold-400 hover:bg-gold-300 rounded flex items-center gap-1 transition">
+              <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> 문구 목록으로 카드 생성
             </button>
           </div>
           <p class="text-[11px] text-gray-400">
-            문구와 기자/매체를 줄바꿈하여 자유롭게 넣으세요. (첫 번째 줄: 한줄평, 두 번째 줄: 언론사/기자)
+            기자 리뷰 문구 목록을 붙여넣으세요. (첫 줄: 헤드카피, 둘째 줄: 매체 및 기자명)
           </p>
-          <textarea id="bulkQuotesInput" rows="7" class="w-full bg-cinema-900 border border-cinema-700 rounded-xl p-3 text-xs font-sans text-gray-200 focus:border-gold-400 focus:outline-none leading-relaxed placeholder-gray-600 resize-y" placeholder="추석엔 '타짜4'맞네! 129분의 러닝타임이 눈코 뜰 새 없이 흘러간다
+          <textarea id="bulkQuotesInput" rows="8" class="w-full bg-cinema-850 border border-cinema-700 rounded-xl p-3 text-xs font-sans text-gray-200 focus:border-gold-400 focus:outline-none leading-relaxed placeholder-gray-600 resize-y" placeholder="추석엔 '타짜4'맞네! 129분의 러닝타임이 눈코 뜰 새 없이 흘러간다
 마이데일리 박로사 기자
 
 인간의 민낯을 집요하게 좇으면서도 오락적 쾌감을 놓치지 않았다
@@ -222,173 +214,175 @@
 
       </div>
 
-      <div id="tabContentStyle" class="p-4 sm:p-5 space-y-6 hidden">
+      <!-- TAB 3: Style & Template Options -->
+      <div id="tabContentStyle" class="flex-1 overflow-y-auto p-4 space-y-4 hidden">
         
-        <!-- Typography Family & Weight -->
-        <div class="bg-cinema-800/70 p-3.5 rounded-xl border border-cinema-700/80 space-y-3">
-          <h3 class="text-xs font-bold text-gray-200 flex items-center gap-1.5">
-            <i data-lucide="type" class="w-3.5 h-3.5 text-gold-400"></i> 서체 및 정렬
-          </h3>
-          
-          <div class="grid grid-cols-2 gap-2.5">
+        <!-- Ratio Selector -->
+        <div class="bg-cinema-850 p-3 rounded-xl border border-cinema-700 space-y-2">
+          <span class="text-xs font-bold text-gray-200 flex items-center justify-between">
+            <span>규격 / 캔버스 종횡비</span>
+            <span id="resolutionBadge" class="text-[11px] font-mono text-gold-400">1000 × 1500 px</span>
+          </span>
+          <div class="grid grid-cols-3 gap-2 text-xs">
+            <button data-ratio="poster" class="ratio-btn active border border-gold-400 bg-gold-400/15 text-white font-semibold py-2 px-1 rounded-lg flex flex-col items-center gap-1">
+              <span class="w-3.5 h-5 border-2 border-gold-400 rounded-sm"></span>
+              <span>세로 포스터</span>
+              <span class="text-[9px] text-gray-400">2:3 (1000×1500)</span>
+            </button>
+            <button data-ratio="square" class="ratio-btn border border-cinema-700 bg-cinema-900 text-gray-300 hover:text-white font-medium py-2 px-1 rounded-lg flex flex-col items-center gap-1">
+              <span class="w-4 h-4 border-2 border-gray-400 rounded-sm"></span>
+              <span>SNS 정방형</span>
+              <span class="text-[9px] text-gray-400">1:1 (1080×1080)</span>
+            </button>
+            <button data-ratio="landscape" class="ratio-btn border border-cinema-700 bg-cinema-900 text-gray-300 hover:text-white font-medium py-2 px-1 rounded-lg flex flex-col items-center gap-1">
+              <span class="w-5 h-3 border-2 border-gray-400 rounded-sm"></span>
+              <span>가로 스틸형</span>
+              <span class="text-[9px] text-gray-400">16:9 (1280×720)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Typo & Layout -->
+        <div class="bg-cinema-850 p-3 rounded-xl border border-cinema-700 space-y-3">
+          <h4 class="text-xs font-bold text-gray-200">폰트 및 배치</h4>
+          <div class="grid grid-cols-2 gap-2">
             <div>
-              <span class="text-[11px] text-gray-400 block mb-1">리뷰 서체 스타일</span>
-              <select id="fontFamilySelect" class="w-full bg-cinema-900 border border-cinema-700 rounded-md px-2.5 py-1.5 text-xs text-white focus:border-gold-400 focus:outline-none">
-                <option value="sans">산세리프 (현대적·강렬함 / Noto Sans)</option>
-                <option value="serif" selected>명조/세리프 (진중함·영화적 / Noto Serif)</option>
+              <span class="text-[10px] text-gray-400 block mb-1">서체 종류</span>
+              <select id="fontFamilySelect" class="w-full bg-cinema-900 border border-cinema-700 rounded p-1.5 text-xs text-white">
+                <option value="serif" selected>시네마 명조 (Noto Serif)</option>
+                <option value="sans">강렬한 고딕 (Noto Sans)</option>
               </select>
             </div>
             <div>
-              <span class="text-[11px] text-gray-400 block mb-1">텍스트 정렬</span>
-              <div class="flex rounded-md bg-cinema-900 border border-cinema-700 p-0.5">
-                <button data-align="left" class="align-btn flex-1 py-1 text-xs text-gray-400 hover:text-white rounded flex justify-center items-center">
-                  <i data-lucide="align-left" class="w-3.5 h-3.5"></i>
-                </button>
-                <button data-align="center" class="align-btn active flex-1 py-1 text-xs bg-cinema-700 text-white rounded flex justify-center items-center">
-                  <i data-lucide="align-center" class="w-3.5 h-3.5"></i>
-                </button>
-                <button data-align="right" class="align-btn flex-1 py-1 text-xs text-gray-400 hover:text-white rounded flex justify-center items-center">
-                  <i data-lucide="align-right" class="w-3.5 h-3.5"></i>
-                </button>
-              </div>
+              <span class="text-[10px] text-gray-400 block mb-1">문구 수직 위치</span>
+              <select id="valignSelect" class="w-full bg-cinema-900 border border-cinema-700 rounded p-1.5 text-xs text-white">
+                <option value="top">상단 배치</option>
+                <option value="middle">중앙 배치</option>
+                <option value="bottom" selected>하단 집중형 (추천)</option>
+              </select>
             </div>
           </div>
 
-          <!-- Quote Position on Screen -->
-          <div>
-            <span class="text-[11px] text-gray-400 block mb-1">문구 배치 위치 (수직)</span>
-            <div class="grid grid-cols-3 gap-2">
-              <button data-valign="top" class="valign-btn py-1.5 text-xs border border-cinema-700 bg-cinema-900 text-gray-300 rounded hover:border-gold-400">상단형</button>
-              <button data-valign="middle" class="valign-btn py-1.5 text-xs border border-cinema-700 bg-cinema-900 text-gray-300 rounded hover:border-gold-400">중앙형</button>
-              <button data-valign="bottom" class="valign-btn active py-1.5 text-xs border border-gold-400 bg-gold-500/10 text-gold-300 font-semibold rounded">하단 집중형</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Cinema Dark Mask & Vignette -->
-        <div class="bg-cinema-800/70 p-3.5 rounded-xl border border-cinema-700/80 space-y-3">
-          <h3 class="text-xs font-bold text-gray-200 flex items-center justify-between">
-            <span class="flex items-center gap-1.5">
-              <i data-lucide="contrast" class="w-3.5 h-3.5 text-gold-400"></i> 가독성 다크 그라데이션 (마스크)
-            </span>
-            <span id="maskOpacityValue" class="text-[11px] text-gold-400 font-mono">75%</span>
-          </h3>
-          <p class="text-[11px] text-gray-400">스틸컷 배경이 밝아도 화이트/골드 텍스트가 또렷하게 보이도록 어두운 톤을 깔아줍니다.</p>
-
-          <div>
-            <input type="range" id="maskOpacitySlider" min="20" max="95" value="75" class="w-full accent-gold-400 cursor-pointer">
-          </div>
-
-          <div class="grid grid-cols-2 gap-2 text-xs">
-            <label class="flex items-center gap-2 bg-cinema-900 p-2 rounded border border-cinema-700 cursor-pointer">
-              <input type="checkbox" id="checkVignette" checked class="accent-gold-400">
-              <span class="text-gray-300 text-[11px]">외곽 시네마 비네팅</span>
-            </label>
-            <label class="flex items-center gap-2 bg-cinema-900 p-2 rounded border border-cinema-700 cursor-pointer">
-              <input type="checkbox" id="checkDualFade" checked class="accent-gold-400">
-              <span class="text-gray-300 text-[11px]">상/하단 듀얼 그라데이션</span>
-            </label>
-          </div>
-        </div>
-
-        <!-- Font Sizes & Highlights -->
-        <div class="bg-cinema-800/70 p-3.5 rounded-xl border border-cinema-700/80 space-y-3">
-          <h3 class="text-xs font-bold text-gray-200 flex items-center gap-1.5">
-            <i data-lucide="palette" class="w-3.5 h-3.5 text-gold-400"></i> 크기 및 포인트 컬러
-          </h3>
-
-          <div class="space-y-2">
-            <div class="flex justify-between items-center text-[11px]">
+          <div class="space-y-1">
+            <div class="flex justify-between text-[11px]">
               <span class="text-gray-400">리뷰 헤드라인 글자 크기</span>
               <span id="quoteSizeVal" class="text-gold-400 font-mono">46px</span>
             </div>
-            <input type="range" id="quoteSizeSlider" min="28" max="72" value="46" class="w-full accent-gold-400 cursor-pointer">
+            <input type="range" id="quoteSizeSlider" min="26" max="72" value="46" class="w-full accent-gold-400 cursor-pointer">
           </div>
 
-          <div class="grid grid-cols-2 gap-3 pt-1">
+          <div class="grid grid-cols-2 gap-2 pt-1">
             <div>
-              <span class="text-[11px] text-gray-400 block mb-1">헤드라인 포인트 컬러</span>
+              <span class="text-[10px] text-gray-400 block mb-1">포인트 강조 컬러</span>
               <div class="flex items-center gap-2">
                 <input type="color" id="accentColorPicker" value="#fbbf24" class="w-8 h-8 rounded bg-transparent cursor-pointer border border-cinema-600">
-                <span class="text-xs text-gray-300 font-mono">#FBBF24</span>
+                <span class="text-xs font-mono text-gray-300">골드 (#FBBF24)</span>
               </div>
             </div>
             <div>
-              <span class="text-[11px] text-gray-400 block mb-1">인용 부호 / 장식 배지</span>
-              <select id="decoSelect" class="w-full bg-cinema-900 border border-cinema-700 rounded-md px-2 py-1.5 text-xs text-white focus:outline-none">
-                <option value="stars">★★★★★ 5성 만점 배지</option>
-                <option value="quotes">“ ” 영문 큰따옴표</option>
-                <option value="bracket">〈 〉 영화식 꺾쇠괄호</option>
-                <option value="none">장식 없음 (텍스트만)</option>
+              <span class="text-[10px] text-gray-400 block mb-1">상단 장식 배지</span>
+              <select id="decoSelect" class="w-full bg-cinema-900 border border-cinema-700 rounded p-1.5 text-xs text-white">
+                <option value="stars">★★★★★ 별점 5개</option>
+                <option value="quotes">“ 큰따옴표</option>
+                <option value="none">장식 없음</option>
               </select>
             </div>
+          </div>
+        </div>
+
+        <!-- Dark Mask for Legibility -->
+        <div class="bg-cinema-850 p-3 rounded-xl border border-cinema-700 space-y-2">
+          <div class="flex justify-between text-xs font-bold text-gray-200">
+            <span>텍스트 가독성 마스크 (그라데이션)</span>
+            <span id="maskOpacityValue" class="text-gold-400 font-mono">75%</span>
+          </div>
+          <input type="range" id="maskOpacitySlider" min="20" max="95" value="75" class="w-full accent-gold-400 cursor-pointer">
+          <div class="flex gap-4 pt-1 text-xs">
+            <label class="flex items-center gap-1.5 text-gray-300 cursor-pointer">
+              <input type="checkbox" id="checkVignette" checked class="accent-gold-400"> 비네팅 테두리
+            </label>
+            <label class="flex items-center gap-1.5 text-gray-300 cursor-pointer">
+              <input type="checkbox" id="checkDualFade" checked class="accent-gold-400"> 상하단 듀얼 페이드
+            </label>
           </div>
         </div>
 
       </div>
+
+      <!-- Left Bottom Reset / Export Meta Info -->
+      <div class="p-3 border-t border-cinema-700/80 bg-cinema-950 flex items-center justify-between text-xs">
+        <button id="btnResetAll" class="text-gray-400 hover:text-red-400 flex items-center gap-1 transition">
+          <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> 전체 초기화
+        </button>
+        <button id="btnForceSave" class="text-gold-400 hover:underline flex items-center gap-1 transition">
+          <i data-lucide="save" class="w-3.5 h-3.5"></i> 수동 저장
+        </button>
+      </div>
     </aside>
 
-    <section class="flex-1 flex flex-col bg-cinema-900 overflow-hidden relative checkered-bg">
+    <section class="flex-1 flex flex-col bg-cinema-950 overflow-hidden relative checkered-bg">
       
       <!-- Top Canvas Controller Bar -->
-      <div class="bg-cinema-850/90 border-b border-cinema-700/80 px-4 py-2 flex items-center justify-between z-10">
+      <div class="bg-cinema-900/90 border-b border-cinema-700/80 px-4 py-2 flex items-center justify-between z-10">
         <div class="flex items-center gap-3">
           <span class="text-xs font-semibold text-gray-300 flex items-center gap-1.5">
-            <i data-lucide="eye" class="w-3.5 h-3.5 text-gold-400"></i> 실시간 캔버스 프리뷰
+            <i data-lucide="eye" class="w-3.5 h-3.5 text-gold-400"></i> 미리보기
           </span>
-          <div class="flex items-center bg-cinema-900 border border-cinema-700 rounded-md text-xs px-2 py-0.5 text-gray-300 gap-1.5">
-            <span>카드 선택:</span>
-            <button id="btnPrevCard" class="hover:text-gold-400 px-1 font-bold">&larr;</button>
-            <span id="currentCardIndicator" class="text-gold-400 font-mono font-bold">1 / 3</span>
-            <button id="btnNextCard" class="hover:text-gold-400 px-1 font-bold">&rarr;</button>
+          <div class="flex items-center bg-cinema-850 border border-cinema-700 rounded-md text-xs px-2 py-0.5 text-gray-300 gap-2">
+            <button id="btnPrevCard" class="hover:text-gold-400 font-bold px-1">&larr;</button>
+            <span id="currentCardIndicator" class="text-gold-400 font-mono font-bold">1 / 5</span>
+            <button id="btnNextCard" class="hover:text-gold-400 font-bold px-1">&rarr;</button>
           </div>
         </div>
 
         <div class="flex items-center gap-2">
-          <!-- Zoom toggle for preview comfort -->
-          <span class="text-[11px] text-gray-400 hidden sm:inline">미리보기 배율:</span>
-          <select id="previewScale" class="bg-cinema-900 border border-cinema-700 text-xs text-gray-200 rounded px-2 py-1 focus:outline-none">
+          <span class="text-[11px] text-gray-400 hidden sm:inline">확대/축소:</span>
+          <select id="previewScale" class="bg-cinema-850 border border-cinema-700 text-xs text-gray-200 rounded px-2 py-1 focus:outline-none">
             <option value="auto">화면 맞춤 (Fit)</option>
             <option value="0.5">50%</option>
             <option value="0.75">75%</option>
-            <option value="1">100% (실제 해상도)</option>
+            <option value="1">100% (원래 해상도)</option>
           </select>
         </div>
       </div>
 
       <!-- Canvas Center Stage -->
-      <div id="canvasContainer" class="flex-1 overflow-auto p-4 md:p-8 flex items-center justify-center relative">
-        <div class="relative shadow-2xl transition-all duration-200 border border-cinema-700/60 rounded-lg overflow-hidden flex items-center justify-center">
+      <div id="canvasContainer" class="flex-1 overflow-auto p-4 md:p-6 flex items-center justify-center relative">
+        <div class="relative shadow-2xl transition-all duration-200 border border-cinema-700/60 rounded-lg overflow-hidden flex items-center justify-center bg-black">
           <canvas id="posterCanvas" class="block max-w-full max-h-[70vh] object-contain shadow-2xl"></canvas>
         </div>
       </div>
 
       <!-- Bottom Card Ribbon Carousel -->
-      <div class="bg-cinema-850 border-t border-cinema-700/80 p-2.5 z-10">
-        <div class="flex items-center justify-between mb-1.5 px-2">
-          <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1">
-            <i data-lucide="layout-grid" class="w-3 h-3 text-gold-400"></i> 생성된 카드뉴스 리스트 (<span id="totalCardsCount">3</span>장)
+      <div class="bg-cinema-900 border-t border-cinema-700/80 p-2 z-10">
+        <div class="flex items-center justify-between mb-1 px-2">
+          <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1">
+            <i data-lucide="film" class="w-3 h-3 text-gold-400"></i> 생성된 카드 덱 (<span id="totalCardsCount">5</span>장)
           </span>
-          <span class="text-[10px] text-gray-400">클릭하여 해당 카드로 전환 및 개별 확인</span>
+          <span class="text-[10px] text-gray-400">하단 카드를 클릭하면 즉시 편집 화면으로 이동합니다</span>
         </div>
-        <div id="cardThumbnailStrip" class="flex gap-2.5 overflow-x-auto px-2 pb-1 scrollbar-thin">
+        <div id="cardThumbnailStrip" class="flex gap-2 overflow-x-auto px-2 pb-1 scrollbar-thin">
           <!-- Populated dynamically with mini previews -->
         </div>
       </div>
 
-      <!-- Toast Alert Notification -->
-      <div id="toast" class="fixed bottom-6 right-6 bg-cinema-800 border border-gold-500/50 text-gray-100 text-xs py-2.5 px-4 rounded-lg shadow-2xl flex items-center gap-2 transform translate-y-20 opacity-0 transition duration-300 pointer-events-none z-50">
+      <!-- Toast Alert Box -->
+      <div id="toast" class="fixed bottom-6 right-6 bg-cinema-850 border border-gold-500/50 text-gray-100 text-xs py-2.5 px-4 rounded-xl shadow-2xl flex items-center gap-2 transform translate-y-20 opacity-0 transition duration-300 pointer-events-none z-50">
         <i data-lucide="check-circle" class="w-4 h-4 text-gold-400"></i>
-        <span id="toastMsg">작업이 완료되었습니다.</span>
+        <span id="toastMsg">작업이 저장되었습니다.</span>
       </div>
 
     </section>
   </main>
 
+  <!-- Single Card Image Edit Modal / Hidden Input Helper -->
+  <input type="file" id="singleImageReplaceInput" accept="image/*" class="hidden">
+
   <script>
-    // State management
+    // State Store
     const state = {
-      ratio: 'poster', // 'poster' (1000x1500), 'square' (1080x1080), 'landscape' (1280x720)
+      projectTitle: "타짜: 벨제붑의 노래",
+      ratio: 'poster',
       dimensions: {
         poster: { width: 1000, height: 1500, label: '1000 × 1500 px' },
         square: { width: 1080, height: 1080, label: '1080 × 1080 px' },
@@ -396,8 +390,7 @@
       },
       common: {
         festivalBadge: "제51회 토론토국제영화제 공식 초청작",
-        movieTitle: "암살자(들)",
-        credits: "9월 극장 대개봉 | 허진호 감독 | 유해진 박해일 이민호"
+        credits: "9월 23일 극장 대개봉 | 허진호 감독 | 유해진 박해일 이민호"
       },
       style: {
         fontFamily: 'serif',
@@ -411,40 +404,13 @@
         decoration: 'stars'
       },
       currentIndex: 0,
-      cards: [] // array of { id, imageSrc, imgObj, quote, byline, stars: 5 }
+      searchQuery: '',
+      cards: [],
+      dirHandle: null // File System Access API directory handle (e.g. C:/wowquote)
     };
 
-    // Preset Sample Data
-    const SAMPLE_REVIEWS = [
-      {
-        quote: "추석엔 '타짜4'맞네! 129분의 러닝타임이 눈코 뜰 새 없이 흘러간다",
-        byline: "마이데일리 박로사 기자",
-        rating: 5
-      },
-      {
-        quote: "인간의 민낯을 집요하게 좇으면서도 오락적 쾌감을 놓치지 않았다",
-        byline: "스포츠동아 장은지 기자",
-        rating: 5
-      },
-      {
-        quote: "올 추석 대중의 오감을 옥죌 압도적인 피날레의 탄생",
-        byline: "뉴스컬처 박동선 기자",
-        rating: 5
-      },
-      {
-        quote: "서늘한 의심으로 시작해 뜨거운 감정으로 폭발한다",
-        byline: "YTN star 김성현 기자",
-        rating: 5
-      },
-      {
-        quote: "장인들이 멱살 잡고 끌고 가는 131분의 압도적 추적극",
-        byline: "정수진 영화칼럼니스트",
-        rating: 5
-      }
-    ];
-
-    // High quality cinematic stock stills (Unsplash moody noir cinema still presets)
-    const SAMPLE_IMAGE_URLS = [
+    // Default Stock Images
+    const DEFAULT_STILLS = [
       "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=1200&q=80",
       "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=1200&q=80",
       "https://images.unsplash.com/photo-1518676599649-7c73b0e5bf1c?auto=format&fit=crop&w=1200&q=80",
@@ -452,102 +418,219 @@
       "https://images.unsplash.com/photo-1574267432553-4b4628081c31?auto=format&fit=crop&w=1200&q=80"
     ];
 
-    // DOM Elements
+    // IndexedDB Database Wrapper
+    const DB_NAME = 'CineQuoteStudioDB';
+    const DB_VERSION = 1;
+    const STORE_NAME = 'projects';
+
+    function openDatabase() {
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open(DB_NAME, DB_VERSION);
+        req.onupgradeneeded = (e) => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains(STORE_NAME)) {
+            db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+          }
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    async function saveStateToStorage() {
+      try {
+        const db = await openDatabase();
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        const store = tx.objectStore(STORE_NAME);
+
+        // Serialize card images to lightweight data
+        const serializableCards = state.cards.map(c => ({
+          id: c.id,
+          imageSrc: c.imageSrc,
+          quote: c.quote,
+          byline: c.byline,
+          rating: c.rating || 5
+        }));
+
+        const payload = {
+          id: 'current_workspace',
+          updatedAt: Date.now(),
+          projectTitle: state.projectTitle,
+          ratio: state.ratio,
+          common: state.common,
+          style: state.style,
+          currentIndex: state.currentIndex,
+          cards: serializableCards
+        };
+
+        store.put(payload);
+        
+        const badge = document.getElementById('saveStatusBadge');
+        if (badge) {
+          badge.innerHTML = `<i data-lucide="check" class="w-3 h-3"></i> 브라우저 자동 저장됨 (${new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })})`;
+          lucide.createIcons();
+        }
+      } catch (err) {
+        console.warn('Storage save skipped or failed:', err);
+      }
+    }
+
+    async function loadStateFromStorage() {
+      try {
+        const db = await openDatabase();
+        return new Promise((resolve) => {
+          const tx = db.transaction(STORE_NAME, 'readonly');
+          const store = tx.objectStore(STORE_NAME);
+          const req = store.get('current_workspace');
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => resolve(null);
+        });
+      } catch (e) {
+        return null;
+      }
+    }
+
+    // DOM Reference
     const canvas = document.getElementById('posterCanvas');
     const ctx = canvas.getContext('2d');
-    const bulkQuotesInput = document.getElementById('bulkQuotesInput');
-    const imageInput = document.getElementById('imageInput');
-    const dropZone = document.getElementById('dropZone');
-    const thumbStrip = document.getElementById('thumbStrip');
+    const toast = document.getElementById('toast');
+    const toastMsg = document.getElementById('toastMsg');
+    const topMovieTitle = document.getElementById('topMovieTitle');
+    const cardsListContainer = document.getElementById('cardsListContainer');
+    const searchInput = document.getElementById('searchInput');
     const cardThumbnailStrip = document.getElementById('cardThumbnailStrip');
     const currentCardIndicator = document.getElementById('currentCardIndicator');
     const totalCardsCount = document.getElementById('totalCardsCount');
-    const imgCountBadge = document.getElementById('imgCountBadge');
-    const resolutionBadge = document.getElementById('resolutionBadge');
-    const toast = document.getElementById('toast');
-    const toastMsg = document.getElementById('toastMsg');
+    const filteredCardCount = document.getElementById('filteredCardCount');
 
-    function showToast(message) {
-      toastMsg.innerText = message;
+    function showToast(msg) {
+      toastMsg.innerText = msg;
       toast.classList.remove('translate-y-20', 'opacity-0');
       toast.classList.add('translate-y-0', 'opacity-100');
       setTimeout(() => {
         toast.classList.add('translate-y-20', 'opacity-0');
         toast.classList.remove('translate-y-0', 'opacity-100');
-      }, 2500);
+      }, 2400);
     }
 
     function loadImage(url) {
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve) => {
         const img = new Image();
         img.crossOrigin = 'anonymous';
         img.onload = () => resolve(img);
         img.onerror = () => {
-          // Fallback colored canvas if remote blocks CORS
-          const dummy = document.createElement('canvas');
-          dummy.width = 1000;
-          dummy.height = 1500;
-          const dCtx = dummy.getContext('2d');
-          dCtx.fillStyle = '#1c2230';
-          dCtx.fillRect(0, 0, 1000, 1500);
-          dCtx.fillStyle = '#475569';
-          dCtx.font = '24px sans-serif';
-          dCtx.textAlign = 'center';
-          dCtx.fillText("영화 스틸컷 이미지 로드됨", 500, 750);
-          const fallbackImg = new Image();
-          fallbackImg.src = dummy.toDataURL();
-          fallbackImg.onload = () => resolve(fallbackImg);
+          const fallback = createFallbackCanvas();
+          const fImg = new Image();
+          fImg.src = fallback;
+          fImg.onload = () => resolve(fImg);
         };
         img.src = url;
       });
     }
 
-    function parseReviewsText(rawText) {
-      const blocks = rawText.split(/\n\s*\n/).map(b => b.trim()).filter(Boolean);
-      const parsed = [];
-
-      blocks.forEach(block => {
-        const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
-        if (lines.length === 1) {
-          // Single line: check if dash separator exists
-          if (lines[0].includes(' - ')) {
-            const parts = lines[0].split(' - ');
-            parsed.push({ quote: parts[0].trim(), byline: parts[1].trim() });
-          } else {
-            parsed.push({ quote: lines[0], byline: "언론 리뷰" });
-          }
-        } else if (lines.length >= 2) {
-          parsed.push({ quote: lines[0], byline: lines[1] });
-        }
-      });
-      return parsed;
+    function createFallbackCanvas() {
+      const c = document.createElement('canvas');
+      c.width = 1000;
+      c.height = 1500;
+      const cctx = c.getContext('2d');
+      cctx.fillStyle = '#1c2433';
+      cctx.fillRect(0, 0, 1000, 1500);
+      cctx.fillStyle = '#64748b';
+      cctx.font = '28px sans-serif';
+      cctx.textAlign = 'center';
+      cctx.fillText("영화 스틸컷 이미지 로드됨", 500, 750);
+      return c.toDataURL();
     }
 
-    async function initSampleData() {
-      state.cards = [];
-      const reviewPairs = SAMPLE_REVIEWS;
+    async function initializeApp() {
+      const saved = await loadStateFromStorage();
+      if (saved && saved.cards && saved.cards.length > 0) {
+        state.projectTitle = saved.projectTitle || state.projectTitle;
+        state.ratio = saved.ratio || state.ratio;
+        state.common = saved.common || state.common;
+        state.style = saved.style || state.style;
+        state.currentIndex = saved.currentIndex || 0;
 
-      for (let i = 0; i < reviewPairs.length; i++) {
-        const imgUrl = SAMPLE_IMAGE_URLS[i % SAMPLE_IMAGE_URLS.length];
-        const imgObj = await loadImage(imgUrl);
+        topMovieTitle.value = state.projectTitle;
+        document.getElementById('inputFestivalBadge').value = state.common.festivalBadge;
+        document.getElementById('inputMovieCredits').value = state.common.credits;
+
+        state.cards = [];
+        for (let i = 0; i < saved.cards.length; i++) {
+          const item = saved.cards[i];
+          const imgObj = await loadImage(item.imageSrc);
+          state.cards.push({
+            id: item.id || 'card_' + Date.now() + '_' + i,
+            imageSrc: item.imageSrc,
+            imgObj: imgObj,
+            quote: item.quote,
+            byline: item.byline,
+            rating: item.rating || 5
+          });
+        }
+        showToast("이전 작업 세션이 복원되었습니다.");
+      } else {
+        await loadDefaultSampleData();
+      }
+
+      applyStyleValuesToInputs();
+      renderCardsList();
+      renderCurrentCard();
+      lucide.createIcons();
+    }
+
+    async function loadDefaultSampleData() {
+      const sampleTexts = [
+        { quote: "추석엔 '타짜4'맞네! 129분의 러닝타임이 눈코 뜰 새 없이 흘러간다", byline: "마이데일리 박로사 기자" },
+        { quote: "인간의 민낯을 집요하게 좇으면서도 오락적 쾌감을 놓치지 않았다", byline: "스포츠동아 장은지 기자" },
+        { quote: "올 추석 대중의 오감을 옥죌 압도적인 피날레의 탄생", byline: "뉴스컬처 박동선 기자" },
+        { quote: "질투와 복수 담은 변요한X노재원, 극장가 향해 美친 질주", byline: "스포츠서울 서지현 기자" },
+        { quote: "초심으로 돌아간 시그니처와 성인 오락 영화의 백미를 모두 살렸다", byline: "OSEN 하수정 기자" }
+      ];
+
+      state.cards = [];
+      for (let i = 0; i < sampleTexts.length; i++) {
+        const url = DEFAULT_STILLS[i % DEFAULT_STILLS.length];
+        const imgObj = await loadImage(url);
         state.cards.push({
           id: 'card_' + Date.now() + '_' + i,
-          imageSrc: imgUrl,
+          imageSrc: url,
           imgObj: imgObj,
-          quote: reviewPairs[i].quote,
-          byline: reviewPairs[i].byline,
+          quote: sampleTexts[i].quote,
+          byline: sampleTexts[i].byline,
           rating: 5
         });
       }
-
       state.currentIndex = 0;
-      updateUI();
-      renderCurrentCard();
-      showToast("샘플 데이터 5장이 로드되었습니다.");
+      await saveStateToStorage();
+    }
+
+    function applyStyleValuesToInputs() {
+      document.getElementById('fontFamilySelect').value = state.style.fontFamily;
+      document.getElementById('valignSelect').value = state.style.valign;
+      document.getElementById('quoteSizeSlider').value = state.style.quoteSize;
+      document.getElementById('quoteSizeVal').innerText = state.style.quoteSize + 'px';
+      document.getElementById('maskOpacitySlider').value = Math.round(state.style.maskOpacity * 100);
+      document.getElementById('maskOpacityValue').innerText = Math.round(state.style.maskOpacity * 100) + '%';
+      document.getElementById('checkVignette').checked = state.style.vignette;
+      document.getElementById('checkDualFade').checked = state.style.dualFade;
+      document.getElementById('accentColorPicker').value = state.style.accentColor;
+      document.getElementById('decoSelect').value = state.style.decoration;
+
+      document.querySelectorAll('.ratio-btn').forEach(btn => {
+        if (btn.dataset.ratio === state.ratio) {
+          btn.className = 'ratio-btn active border border-gold-400 bg-gold-400/15 text-white font-semibold py-2 px-1 rounded-lg flex flex-col items-center gap-1';
+        } else {
+          btn.className = 'ratio-btn border border-cinema-700 bg-cinema-900 text-gray-300 hover:text-white font-medium py-2 px-1 rounded-lg flex flex-col items-center gap-1';
+        }
+      });
+      document.getElementById('resolutionBadge').innerText = state.dimensions[state.ratio].label;
     }
 
     function renderCurrentCard() {
       if (!state.cards || state.cards.length === 0) return;
+      if (state.currentIndex >= state.cards.length) state.currentIndex = 0;
+
       const card = state.cards[state.currentIndex];
       if (!card) return;
 
@@ -555,30 +638,30 @@
       canvas.width = dim.width;
       canvas.height = dim.height;
 
-      // 1. Draw Background Movie Still (Cover Crop)
+      // 1. Draw Background Movie Still Image
       if (card.imgObj) {
         drawImageCover(ctx, card.imgObj, 0, 0, dim.width, dim.height);
       } else {
-        ctx.fillStyle = '#111827';
+        ctx.fillStyle = '#0f131a';
         ctx.fillRect(0, 0, dim.width, dim.height);
       }
 
-      // 2. Cinematic Gradient Overlay & Masks
+      // 2. Cinematic Gradient Masks
       applyCinematicMasks(ctx, dim.width, dim.height);
 
-      // 3. Render Top Festival Badge / Laurel
+      // 3. Render Top Laurel/Festival Badge
       if (state.common.festivalBadge && state.common.festivalBadge.trim() !== '') {
         renderTopFestivalBadge(ctx, state.common.festivalBadge, dim.width);
       }
 
-      // 4. Render Main Review Quote & Accents
+      // 4. Render Quote & Byline
       renderQuoteSection(ctx, card, dim.width, dim.height);
 
-      // 5. Render Bottom Title, Credits & Premiere Date
-      renderBottomCredits(ctx, dim.width, dim.height);
+      // 5. Render Bottom Film Title and Billing Block
+      renderBottomBilling(ctx, dim.width, dim.height);
 
-      // Update Mini Thumbnails
-      updateRibbonHighlight();
+      // Update counters & bottom highlight
+      updateCarouselUI();
     }
 
     function drawImageCover(ctx, img, x, y, w, h) {
@@ -597,38 +680,35 @@
         offsetX = 0;
         offsetY = (h - renderH) / 2;
       }
-
       ctx.drawImage(img, offsetX, offsetY, renderW, renderH);
     }
 
     function applyCinematicMasks(ctx, w, h) {
       const baseOpacity = parseFloat(state.style.maskOpacity);
 
-      // A. Dual Gradient Fade (Top & Bottom)
       if (state.style.dualFade) {
-        // Bottom Fade (Heavy for text legibility)
+        // Bottom Gradient
         const bottomGrad = ctx.createLinearGradient(0, h * 0.35, 0, h);
-        bottomGrad.addColorStop(0, 'rgba(6, 8, 12, 0)');
-        bottomGrad.addColorStop(0.5, `rgba(8, 10, 15, ${baseOpacity * 0.75})`);
-        bottomGrad.addColorStop(1, `rgba(4, 5, 8, ${Math.min(1, baseOpacity * 1.15)})`);
+        bottomGrad.addColorStop(0, 'rgba(5, 7, 10, 0)');
+        bottomGrad.addColorStop(0.48, `rgba(7, 9, 14, ${baseOpacity * 0.72})`);
+        bottomGrad.addColorStop(1, `rgba(3, 4, 7, ${Math.min(1, baseOpacity * 1.15)})`);
         ctx.fillStyle = bottomGrad;
         ctx.fillRect(0, 0, w, h);
 
-        // Top Fade (Subtle for Festival laurels & badges)
-        const topGrad = ctx.createLinearGradient(0, 0, 0, h * 0.35);
-        topGrad.addColorStop(0, `rgba(4, 5, 8, ${baseOpacity * 0.8})`);
-        topGrad.addColorStop(0.7, `rgba(6, 8, 12, ${baseOpacity * 0.3})`);
+        // Top Gradient
+        const topGrad = ctx.createLinearGradient(0, 0, 0, h * 0.32);
+        topGrad.addColorStop(0, `rgba(3, 4, 7, ${baseOpacity * 0.82})`);
+        topGrad.addColorStop(0.7, `rgba(6, 8, 12, ${baseOpacity * 0.28})`);
         topGrad.addColorStop(1, 'rgba(6, 8, 12, 0)');
         ctx.fillStyle = topGrad;
-        ctx.fillRect(0, 0, w, h * 0.35);
+        ctx.fillRect(0, 0, w, h * 0.32);
       }
 
-      // B. Radial Vignette for movie-theatre atmosphere
       if (state.style.vignette) {
-        const radius = Math.max(w, h) * 0.7;
-        const vignette = ctx.createRadialGradient(w / 2, h / 2, radius * 0.45, w / 2, h / 2, radius);
+        const radius = Math.max(w, h) * 0.72;
+        const vignette = ctx.createRadialGradient(w / 2, h / 2, radius * 0.42, w / 2, h / 2, radius);
         vignette.addColorStop(0, 'rgba(0,0,0,0)');
-        vignette.addColorStop(1, 'rgba(0,0,0,0.6)');
+        vignette.addColorStop(1, 'rgba(0,0,0,0.65)');
         ctx.fillStyle = vignette;
         ctx.fillRect(0, 0, w, h);
       }
@@ -637,86 +717,74 @@
     function renderTopFestivalBadge(ctx, text, w) {
       ctx.save();
       ctx.textAlign = 'center';
-
-      // Small laurel leaf or badge box
-      const badgeY = 60;
+      const badgeY = 64;
       ctx.font = '500 16px "Noto Sans KR", sans-serif';
       ctx.letterSpacing = '3px';
-      ctx.fillStyle = '#d1d5db'; // Light silver
-      
-      // Top minimal line or box
+      ctx.fillStyle = '#e2e8f0';
       ctx.fillText(text.toUpperCase(), w / 2, badgeY);
 
-      // Fine golden divider line
+      // Gold under-divider
       ctx.strokeStyle = state.style.accentColor;
       ctx.lineWidth = 1.5;
-      ctx.globalAlpha = 0.6;
+      ctx.globalAlpha = 0.65;
       ctx.beginPath();
-      ctx.moveTo(w / 2 - 40, badgeY + 12);
-      ctx.lineTo(w / 2 + 40, badgeY + 12);
+      ctx.moveTo(w / 2 - 45, badgeY + 12);
+      ctx.lineTo(w / 2 + 45, badgeY + 12);
       ctx.stroke();
-
       ctx.restore();
     }
 
     function renderQuoteSection(ctx, card, w, h) {
       ctx.save();
-
       const isSerif = state.style.fontFamily === 'serif';
-      const quoteFontName = isSerif ? '"Noto Serif KR", serif' : '"Noto Sans KR", sans-serif';
+      const quoteFont = isSerif ? '"Noto Serif KR", serif' : '"Noto Sans KR", sans-serif';
       const fontSize = parseInt(state.style.quoteSize);
       const align = state.style.align;
       const valign = state.style.valign;
 
       let startY;
       if (valign === 'top') {
-        startY = h * 0.28;
+        startY = h * 0.26;
       } else if (valign === 'middle') {
-        startY = h * 0.45;
+        startY = h * 0.44;
       } else {
-        // Bottom focused (Cinema standard)
-        startY = state.ratio === 'landscape' ? h * 0.52 : h * 0.62;
+        startY = state.ratio === 'landscape' ? h * 0.50 : h * 0.61;
       }
 
-      // Decoration: 5 Stars or Quotes
+      // Decoration
       if (state.style.decoration === 'stars') {
         ctx.textAlign = 'center';
         ctx.font = '900 24px sans-serif';
         ctx.fillStyle = state.style.accentColor;
-        ctx.shadowColor = 'rgba(0,0,0,0.8)';
-        ctx.shadowBlur = 10;
-        ctx.fillText('★ ★ ★ ★ ★', w / 2, startY - (fontSize * 0.9));
+        ctx.shadowColor = 'rgba(0,0,0,0.9)';
+        ctx.shadowBlur = 12;
+        ctx.fillText('★ ★ ★ ★ ★', w / 2, startY - (fontSize * 0.85));
       } else if (state.style.decoration === 'quotes') {
         ctx.textAlign = 'center';
-        ctx.font = '800 50px "Cinzel", serif';
+        ctx.font = '900 52px "Cinzel", serif';
         ctx.fillStyle = state.style.accentColor;
-        ctx.shadowColor = 'rgba(0,0,0,0.8)';
-        ctx.shadowBlur = 10;
-        ctx.fillText('“', w / 2, startY - (fontSize * 0.6));
+        ctx.shadowColor = 'rgba(0,0,0,0.9)';
+        ctx.shadowBlur = 12;
+        ctx.fillText('“', w / 2, startY - (fontSize * 0.5));
       }
 
-      // Text Alignment & X Coordinates
       let startX = w / 2;
       ctx.textAlign = align;
       if (align === 'left') startX = w * 0.1;
       if (align === 'right') startX = w * 0.9;
 
-      // Wrap lines logic
-      const maxLineWidth = w * 0.82;
-      ctx.font = `900 ${fontSize}px ${quoteFontName}`;
+      const maxLineWidth = w * 0.84;
+      ctx.font = `900 ${fontSize}px ${quoteFont}`;
       ctx.fillStyle = '#ffffff';
       ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
       ctx.shadowBlur = 18;
       ctx.shadowOffsetY = 4;
 
       const lines = wrapKoreanText(ctx, card.quote, maxLineWidth);
-      const lineHeight = fontSize * 1.38;
+      const lineHeight = fontSize * 1.36;
 
-      // Draw Main Lines with highlight tags if bracket exists
       lines.forEach((line, idx) => {
         const lineY = startY + (idx * lineHeight);
-        
-        // If line contains movie quotation highlight <...>, color it in Gold
         if (line.includes('<') && line.includes('>')) {
           renderHighlightedLine(ctx, line, startX, lineY, align, state.style.accentColor);
         } else {
@@ -725,11 +793,11 @@
         }
       });
 
-      // Byline / Journalist Info
+      // Byline
       const bylineY = startY + (lines.length * lineHeight) + 24;
       ctx.shadowBlur = 8;
       ctx.font = '500 20px "Noto Sans KR", sans-serif';
-      ctx.fillStyle = '#cbd5e1'; // Slate-300
+      ctx.fillStyle = '#cbd5e1';
       ctx.letterSpacing = '1px';
       ctx.fillText(card.byline, startX, bylineY);
 
@@ -737,7 +805,7 @@
     }
 
     function wrapKoreanText(ctx, text, maxWidth) {
-      const words = text.split(' ');
+      const words = (text || '').split(' ');
       const lines = [];
       let currentLine = '';
 
@@ -757,10 +825,7 @@
     }
 
     function renderHighlightedLine(ctx, line, x, y, align, highlightColor) {
-      // Split by < and >
       const parts = line.split(/(<[^>]+>)/g);
-      
-      // Calculate total width to handle alignment
       const fullWidth = ctx.measureText(line).width;
       let drawX = x;
       if (align === 'center') drawX = x - (fullWidth / 2);
@@ -781,230 +846,311 @@
       ctx.restore();
     }
 
-    function renderBottomCredits(ctx, w, h) {
+    function renderBottomBilling(ctx, w, h) {
       ctx.save();
       ctx.textAlign = 'center';
-
-      const title = state.common.movieTitle || '';
+      const title = state.projectTitle || '';
       const credits = state.common.credits || '';
 
       if (state.ratio === 'landscape') {
-        // Landscape: subtle corner watermark style
-        ctx.font = '800 24px "Noto Sans KR", sans-serif';
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        ctx.font = '800 26px "Noto Sans KR", sans-serif';
+        ctx.fillStyle = '#ffffff';
         ctx.shadowColor = 'black';
         ctx.shadowBlur = 10;
         ctx.textAlign = 'right';
-        ctx.fillText(title, w - 40, h - 35);
+        ctx.fillText(title, w - 40, h - 38);
         ctx.font = '400 13px "Noto Sans KR", sans-serif';
-        ctx.fillStyle = 'rgba(209, 213, 219, 0.8)';
+        ctx.fillStyle = 'rgba(226, 232, 240, 0.85)';
         ctx.fillText(credits, w - 40, h - 18);
       } else {
-        // Poster & Square: Grand bottom title billing
         const titleY = h - 85;
-        ctx.font = '900 48px "Noto Sans KR", sans-serif';
+        ctx.font = '900 46px "Noto Sans KR", sans-serif';
         ctx.fillStyle = '#ffffff';
-        ctx.shadowColor = 'rgba(0,0,0,0.9)';
+        ctx.shadowColor = 'rgba(0,0,0,0.95)';
         ctx.shadowBlur = 20;
-        ctx.letterSpacing = '4px';
+        ctx.letterSpacing = '3px';
         ctx.fillText(title, w / 2, titleY);
 
         const creditsY = h - 45;
-        ctx.font = '500 15px "Noto Sans KR", sans-serif';
-        ctx.fillStyle = '#f59e0b'; // Amber-500
+        ctx.font = '600 15px "Noto Sans KR", sans-serif';
+        ctx.fillStyle = state.style.accentColor;
         ctx.letterSpacing = '2px';
         ctx.fillText(credits, w / 2, creditsY);
       }
-
       ctx.restore();
     }
 
-    function updateUI() {
-      // 1. Update Counts
-      totalCardsCount.innerText = state.cards.length;
-      imgCountBadge.innerText = `총 ${state.cards.length}장 등록됨`;
-      currentCardIndicator.innerText = `${state.cards.length > 0 ? state.currentIndex + 1 : 0} / ${state.cards.length}`;
+    let cardToReplaceImageIndex = null;
 
-      // 2. Build Thumbnails Strip in Input Tab
-      thumbStrip.innerHTML = '';
-      state.cards.forEach((card, idx) => {
-        const thumb = document.createElement('div');
-        thumb.className = `relative w-16 h-16 rounded-lg overflow-hidden border-2 cursor-pointer flex-shrink-0 transition ${idx === state.currentIndex ? 'border-gold-400 ring-2 ring-gold-400/40' : 'border-cinema-700 opacity-60 hover:opacity-100'}`;
-        thumb.innerHTML = `
-          <img src="${card.imageSrc}" class="w-full h-full object-cover">
-          <span class="absolute bottom-0.5 right-1 text-[10px] font-mono bg-black/80 px-1 rounded text-white font-bold">${idx + 1}</span>
+    function renderCardsList() {
+      cardsListContainer.innerHTML = '';
+      const query = (state.searchQuery || '').trim().toLowerCase();
+
+      const filteredCards = state.cards.map((card, originalIndex) => ({ card, originalIndex }))
+        .filter(({ card }) => {
+          if (!query) return true;
+          return (card.quote && card.quote.toLowerCase().includes(query)) ||
+                 (card.byline && card.byline.toLowerCase().includes(query));
+        });
+
+      filteredCardCount.innerText = `총 ${state.cards.length}개 중 ${filteredCards.length}개 표시 중`;
+
+      if (filteredCards.length === 0) {
+        cardsListContainer.innerHTML = `
+          <div class="text-center py-8 text-gray-500 text-xs">
+            <i data-lucide="search-x" class="w-6 h-6 mx-auto mb-2 text-gray-600"></i>
+            일치하는 리뷰 문구가 없습니다.
+          </div>
         `;
-        thumb.onclick = () => {
-          state.currentIndex = idx;
-          renderCurrentCard();
-          updateRibbonHighlight();
-        };
-        thumbStrip.appendChild(thumb);
+        lucide.createIcons();
+        return;
+      }
+
+      filteredCards.forEach(({ card, originalIndex }) => {
+        const isCurrent = originalIndex === state.currentIndex;
+        const cardEl = document.createElement('div');
+        cardEl.className = `p-3 rounded-xl border transition space-y-2.5 ${isCurrent ? 'bg-cinema-800/90 border-gold-400 ring-1 ring-gold-400/40' : 'bg-cinema-850/80 border-cinema-700/80 hover:border-cinema-600'}`;
+
+        cardEl.innerHTML = `
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded bg-cinema-900 border border-cinema-700 text-gold-400 font-bold text-xs flex items-center justify-center font-mono">
+                ${originalIndex + 1}
+              </span>
+              <span class="text-xs font-semibold text-gray-300">카드 #${originalIndex + 1}</span>
+            </div>
+
+            <!-- Reorder & Action Controls -->
+            <div class="flex items-center gap-1">
+              <button onclick="moveCard(${originalIndex}, -1)" ${originalIndex === 0 ? 'disabled' : ''} class="p-1 rounded hover:bg-cinema-700 text-gray-400 hover:text-white disabled:opacity-30 disabled:hover:bg-transparent" title="위로 이동">
+                <i data-lucide="chevron-up" class="w-4 h-4"></i>
+              </button>
+              <button onclick="moveCard(${originalIndex}, 1)" ${originalIndex === state.cards.length - 1 ? 'disabled' : ''} class="p-1 rounded hover:bg-cinema-700 text-gray-400 hover:text-white disabled:opacity-30 disabled:hover:bg-transparent" title="아래로 이동">
+                <i data-lucide="chevron-down" class="w-4 h-4"></i>
+              </button>
+              <button onclick="triggerImageReplace(${originalIndex})" class="p-1 rounded hover:bg-cinema-700 text-amber-400 hover:text-amber-300 ml-1" title="스틸 이미지 교체">
+                <i data-lucide="image" class="w-4 h-4"></i>
+              </button>
+              <button onclick="deleteCard(${originalIndex})" class="p-1 rounded hover:bg-cinema-700 text-red-400 hover:text-red-300" title="카드 삭제">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Thumbnail & In-place inputs -->
+          <div class="flex gap-2.5 items-start">
+            <div onclick="selectCard(${originalIndex})" class="w-14 h-16 rounded-md overflow-hidden bg-cinema-900 flex-shrink-0 cursor-pointer border border-cinema-700 relative group">
+              <img src="${card.imageSrc}" class="w-full h-full object-cover group-hover:scale-105 transition">
+              <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-[10px] text-white">미리보기</div>
+            </div>
+            <div class="flex-1 space-y-1.5">
+              <textarea onchange="updateCardQuote(${originalIndex}, this.value)" class="w-full bg-cinema-900 border border-cinema-700 rounded p-1.5 text-xs text-white placeholder-gray-500 focus:border-gold-400 focus:outline-none resize-none leading-relaxed" rows="2" placeholder="리뷰 카피 입력">${card.quote}</textarea>
+              <div class="flex gap-1.5">
+                <input type="text" onchange="updateCardByline(${originalIndex}, this.value)" value="${card.byline}" class="w-full bg-cinema-900 border border-cinema-700 rounded px-2 py-1 text-[11px] text-gray-300 placeholder-gray-500 focus:border-gold-400 focus:outline-none" placeholder="매체 및 기자명">
+                <button onclick="selectCard(${originalIndex})" class="px-2 py-1 text-[11px] rounded bg-cinema-700 hover:bg-cinema-600 text-white font-medium flex-shrink-0">선택</button>
+              </div>
+            </div>
+          </div>
+        `;
+
+        cardsListContainer.appendChild(cardEl);
       });
 
-      // 3. Build Bottom Carousel Ribbon
+      updateCarouselUI();
+      lucide.createIcons();
+    }
+
+    // Carousel bottom strip
+    function updateCarouselUI() {
+      totalCardsCount.innerText = state.cards.length;
+      currentCardIndicator.innerText = `${state.cards.length > 0 ? state.currentIndex + 1 : 0} / ${state.cards.length}`;
+
       cardThumbnailStrip.innerHTML = '';
-      state.cards.forEach((card, idx) => {
+      state.cards.forEach((c, idx) => {
         const item = document.createElement('button');
-        item.className = `ribbon-item flex-shrink-0 px-3 py-2 rounded-lg border text-left transition flex items-center gap-2.5 max-w-[220px] ${idx === state.currentIndex ? 'border-gold-400 bg-gold-500/15 text-white' : 'border-cinema-700 bg-cinema-900/80 text-gray-400 hover:text-gray-200'}`;
-        item.onclick = () => {
-          state.currentIndex = idx;
-          renderCurrentCard();
-          updateRibbonHighlight();
-        };
+        item.className = `flex-shrink-0 px-2.5 py-1.5 rounded-lg border text-left transition flex items-center gap-2 max-w-[200px] ${idx === state.currentIndex ? 'border-gold-400 bg-gold-500/15 text-white ring-1 ring-gold-400/40' : 'border-cinema-700 bg-cinema-850 text-gray-400 hover:text-gray-200'}`;
+        item.onclick = () => selectCard(idx);
         item.innerHTML = `
-          <span class="w-6 h-6 rounded bg-cinema-800 border border-cinema-700 font-bold text-xs flex items-center justify-center text-gold-400 flex-shrink-0">${idx + 1}</span>
+          <span class="w-5 h-5 rounded bg-cinema-900 border border-cinema-700 font-bold text-[11px] flex items-center justify-center text-gold-400 flex-shrink-0">${idx + 1}</span>
           <div class="truncate text-xs">
-            <p class="truncate font-medium text-white">${card.quote}</p>
-            <p class="truncate text-[10px] text-gray-400">${card.byline}</p>
+            <p class="truncate font-medium text-white text-[11px]">${c.quote}</p>
+            <p class="truncate text-[10px] text-gray-400">${c.byline}</p>
           </div>
         `;
         cardThumbnailStrip.appendChild(item);
       });
-
-      lucide.createIcons();
     }
 
-    function updateRibbonHighlight() {
-      currentCardIndicator.innerText = `${state.cards.length > 0 ? state.currentIndex + 1 : 0} / ${state.cards.length}`;
-      const ribbonItems = cardThumbnailStrip.querySelectorAll('.ribbon-item');
-      ribbonItems.forEach((btn, idx) => {
-        if (idx === state.currentIndex) {
-          btn.className = 'ribbon-item flex-shrink-0 px-3 py-2 rounded-lg border text-left transition flex items-center gap-2.5 max-w-[220px] border-gold-400 bg-gold-500/15 text-white ring-1 ring-gold-400/30';
-        } else {
-          btn.className = 'ribbon-item flex-shrink-0 px-3 py-2 rounded-lg border text-left transition flex items-center gap-2.5 max-w-[220px] border-cinema-700 bg-cinema-900/80 text-gray-400 hover:text-gray-200';
+    window.selectCard = function(index) {
+      state.currentIndex = index;
+      renderCardsList();
+      renderCurrentCard();
+    };
+
+    window.moveCard = function(index, direction) {
+      const targetIndex = index + direction;
+      if (targetIndex < 0 || targetIndex >= state.cards.length) return;
+
+      const temp = state.cards[index];
+      state.cards[index] = state.cards[targetIndex];
+      state.cards[targetIndex] = temp;
+
+      if (state.currentIndex === index) {
+        state.currentIndex = targetIndex;
+      } else if (state.currentIndex === targetIndex) {
+        state.currentIndex = index;
+      }
+
+      renderCardsList();
+      renderCurrentCard();
+      saveStateToStorage();
+      showToast(`카드 #${index + 1}의 순서가 변경되었습니다.`);
+    };
+
+    window.deleteCard = function(index) {
+      if (state.cards.length <= 1) {
+        showToast("최소 1장의 카드는 유지되어야 합니다.");
+        return;
+      }
+      state.cards.splice(index, 1);
+      if (state.currentIndex >= state.cards.length) {
+        state.currentIndex = state.cards.length - 1;
+      }
+      renderCardsList();
+      renderCurrentCard();
+      saveStateToStorage();
+      showToast("카드가 삭제되었습니다.");
+    };
+
+    window.updateCardQuote = function(index, val) {
+      if (state.cards[index]) {
+        state.cards[index].quote = val;
+        renderCurrentCard();
+        saveStateToStorage();
+      }
+    };
+
+    window.updateCardByline = function(index, val) {
+      if (state.cards[index]) {
+        state.cards[index].byline = val;
+        renderCurrentCard();
+        saveStateToStorage();
+      }
+    };
+
+    window.triggerImageReplace = function(index) {
+      cardToReplaceImageIndex = index;
+      document.getElementById('singleImageReplaceInput').click();
+    };
+
+    document.getElementById('singleImageReplaceInput').addEventListener('change', async (e) => {
+      if (e.target.files && e.target.files[0] && cardToReplaceImageIndex !== null) {
+        const file = e.target.files[0];
+        const dataUrl = await readFileAsDataURL(file);
+        const imgObj = await loadImage(dataUrl);
+
+        state.cards[cardToReplaceImageIndex].imageSrc = dataUrl;
+        state.cards[cardToReplaceImageIndex].imgObj = imgObj;
+        
+        renderCardsList();
+        renderCurrentCard();
+        saveStateToStorage();
+        showToast(`카드 #${cardToReplaceImageIndex + 1}의 스틸컷이 교체되었습니다.`);
+        cardToReplaceImageIndex = null;
+      }
+    });
+
+    // Add new blank card
+    document.getElementById('btnAddNewCard').addEventListener('click', async () => {
+      const defaultImg = state.cards[0] ? state.cards[0].imageSrc : DEFAULT_STILLS[0];
+      const imgObj = await loadImage(defaultImg);
+      const newCard = {
+        id: 'card_' + Date.now(),
+        imageSrc: defaultImg,
+        imgObj: imgObj,
+        quote: "새로운 영화 한줄평 리뷰 문구를 입력하세요.",
+        byline: "영화 매체명 기자",
+        rating: 5
+      };
+      state.cards.push(newCard);
+      state.currentIndex = state.cards.length - 1;
+      renderCardsList();
+      renderCurrentCard();
+      saveStateToStorage();
+      showToast("새 카드가 추가되었습니다.");
+    });
+
+    // Search filter input listener
+    searchInput.addEventListener('input', (e) => {
+      state.searchQuery = e.target.value;
+      renderCardsList();
+    });
+
+    const btnSetDirectory = document.getElementById('btnSetDirectory');
+    const btnSaveToDir = document.getElementById('btnSaveToDir');
+    const dirNameDisplay = document.getElementById('dirNameDisplay');
+
+    btnSetDirectory.addEventListener('click', async () => {
+      if (!('showDirectoryPicker' in window)) {
+        showToast("현재 브라우저가 직접 폴더 저장을 지원하지 않아 ZIP 다운로드로 대체됩니다.");
+        return;
+      }
+
+      try {
+        const dirHandle = await window.showDirectoryPicker({
+          id: 'wowquote_folder',
+          mode: 'readwrite',
+          startIn: 'documents'
+        });
+        state.dirHandle = dirHandle;
+        dirNameDisplay.innerText = `저장 폴더: [${dirHandle.name}]`;
+        btnSaveToDir.classList.remove('hidden');
+        showToast(`로컬 폴더 [${dirHandle.name}]가 성공적으로 연결되었습니다!`);
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          console.error(err);
+          showToast("폴더 선택 중 오류가 발생했습니다.");
         }
-      });
-    }
-
-    // Ratio Selector Buttons
-    document.querySelectorAll('.ratio-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.ratio-btn').forEach(b => {
-          b.classList.remove('active', 'border-gold-400', 'bg-gold-400/15', 'text-white');
-          b.classList.add('border-cinema-700', 'bg-cinema-900/60', 'text-gray-300');
-        });
-        btn.classList.add('active', 'border-gold-400', 'bg-gold-400/15', 'text-white');
-        btn.classList.remove('border-cinema-700', 'bg-cinema-900/60', 'text-gray-300');
-
-        state.ratio = btn.dataset.ratio;
-        resolutionBadge.innerText = state.dimensions[state.ratio].label;
-        renderCurrentCard();
-      });
+      }
     });
 
-    // Tab Switching
-    const tabBtnInput = document.getElementById('tabBtnInput');
-    const tabBtnStyle = document.getElementById('tabBtnStyle');
-    const tabContentInput = document.getElementById('tabContentInput');
-    const tabContentStyle = document.getElementById('tabContentStyle');
-
-    tabBtnInput.addEventListener('click', () => {
-      tabBtnInput.className = 'flex-1 py-3 text-xs font-bold border-b-2 border-gold-400 text-gold-400 flex items-center justify-center gap-1.5 transition';
-      tabBtnStyle.className = 'flex-1 py-3 text-xs font-semibold border-b-2 border-transparent text-gray-400 hover:text-gray-200 flex items-center justify-center gap-1.5 transition';
-      tabContentInput.classList.remove('hidden');
-      tabContentStyle.classList.add('hidden');
-    });
-
-    tabBtnStyle.addEventListener('click', () => {
-      tabBtnStyle.className = 'flex-1 py-3 text-xs font-bold border-b-2 border-gold-400 text-gold-400 flex items-center justify-center gap-1.5 transition';
-      tabBtnInput.className = 'flex-1 py-3 text-xs font-semibold border-b-2 border-transparent text-gray-400 hover:text-gray-200 flex items-center justify-center gap-1.5 transition';
-      tabContentStyle.classList.remove('hidden');
-      tabContentInput.classList.add('hidden');
-    });
-
-    // Style Controls Bindings
-    document.getElementById('fontFamilySelect').addEventListener('change', (e) => {
-      state.style.fontFamily = e.target.value;
-      renderCurrentCard();
-    });
-
-    document.getElementById('maskOpacitySlider').addEventListener('input', (e) => {
-      state.style.maskOpacity = e.target.value / 100;
-      document.getElementById('maskOpacityValue').innerText = e.target.value + '%';
-      renderCurrentCard();
-    });
-
-    document.getElementById('checkVignette').addEventListener('change', (e) => {
-      state.style.vignette = e.target.checked;
-      renderCurrentCard();
-    });
-
-    document.getElementById('checkDualFade').addEventListener('change', (e) => {
-      state.style.dualFade = e.target.checked;
-      renderCurrentCard();
-    });
-
-    document.getElementById('quoteSizeSlider').addEventListener('input', (e) => {
-      state.style.quoteSize = e.target.value;
-      document.getElementById('quoteSizeVal').innerText = e.target.value + 'px';
-      renderCurrentCard();
-    });
-
-    document.getElementById('accentColorPicker').addEventListener('input', (e) => {
-      state.style.accentColor = e.target.value;
-      renderCurrentCard();
-    });
-
-    document.getElementById('decoSelect').addEventListener('change', (e) => {
-      state.style.decoration = e.target.value;
-      renderCurrentCard();
-    });
-
-    // Text Align Buttons
-    document.querySelectorAll('.align-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.align-btn').forEach(b => {
-          b.classList.remove('active', 'bg-cinema-700', 'text-white');
-          b.classList.add('text-gray-400');
-        });
-        btn.classList.add('active', 'bg-cinema-700', 'text-white');
-        btn.classList.remove('text-gray-400');
-        state.style.align = btn.dataset.align;
-        renderCurrentCard();
-      });
-    });
-
-    // Vertical Align Buttons
-    document.querySelectorAll('.valign-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.valign-btn').forEach(b => {
-          b.classList.remove('active', 'border-gold-400', 'bg-gold-500/10', 'text-gold-300', 'font-semibold');
-          b.classList.add('border-cinema-700', 'bg-cinema-900', 'text-gray-300');
-        });
-        btn.classList.add('active', 'border-gold-400', 'bg-gold-500/10', 'text-gold-300', 'font-semibold');
-        btn.classList.remove('border-cinema-700', 'bg-cinema-900', 'text-gray-300');
-        state.style.valign = btn.dataset.valign;
-        renderCurrentCard();
-      });
-    });
-
-    // Movie Header & Info inputs
-    document.getElementById('inputFestivalBadge').addEventListener('input', (e) => {
-      state.common.festivalBadge = e.target.value;
-      renderCurrentCard();
-    });
-    document.getElementById('inputMovieTitle').addEventListener('input', (e) => {
-      state.common.movieTitle = e.target.value;
-      renderCurrentCard();
-    });
-    document.getElementById('inputMovieCredits').addEventListener('input', (e) => {
-      state.common.credits = e.target.value;
-      renderCurrentCard();
-    });
-
-    // Navigation Buttons for cards
-    document.getElementById('btnPrevCard').addEventListener('click', () => {
+    btnSaveToDir.addEventListener('click', async () => {
+      if (!state.dirHandle) {
+        showToast("먼저 로컬 폴더(예: C:/wowquote)를 지정해 주세요.");
+        return;
+      }
       if (state.cards.length === 0) return;
-      state.currentIndex = (state.currentIndex - 1 + state.cards.length) % state.cards.length;
-      renderCurrentCard();
+
+      showToast("로컬 폴더에 이미지 파일들을 직접 저장하는 중...");
+      const origIndex = state.currentIndex;
+
+      try {
+        for (let i = 0; i < state.cards.length; i++) {
+          state.currentIndex = i;
+          renderCurrentCard();
+
+          const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.94));
+          const safeTitle = (state.projectTitle || 'Movie').replace(/[/\\?%*:|"<>]/g, '_');
+          const fileName = `${safeTitle}_Card_${String(i + 1).padStart(2, '0')}.jpg`;
+
+          const fileHandle = await state.dirHandle.getFileHandle(fileName, { create: true });
+          const writable = await fileHandle.createWritable();
+          await writable.write(blob);
+          await writable.close();
+        }
+
+        state.currentIndex = origIndex;
+        renderCurrentCard();
+        showToast(`총 ${state.cards.length}장의 이미지가 연결된 로컬 폴더에 저장되었습니다!`);
+      } catch (err) {
+        console.error(err);
+        showToast("폴더 쓰기 권한이 없거나 저장에 실패했습니다.");
+      }
     });
 
-    document.getElementById('btnNextCard').addEventListener('click', () => {
-      if (state.cards.length === 0) return;
-      state.currentIndex = (state.currentIndex + 1) % state.cards.length;
-      renderCurrentCard();
-    });
+    const dropZone = document.getElementById('dropZone');
+    const imageInput = document.getElementById('imageInput');
+    const bulkQuotesInput = document.getElementById('bulkQuotesInput');
 
     dropZone.addEventListener('click', () => imageInput.click());
     dropZone.addEventListener('dragover', (e) => {
@@ -1018,25 +1164,24 @@
       e.preventDefault();
       dropZone.classList.remove('border-gold-400', 'bg-cinema-800');
       if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-        handleImageUpload(e.dataTransfer.files);
+        handleBatchImages(e.dataTransfer.files);
       }
     });
     imageInput.addEventListener('change', (e) => {
       if (e.target.files && e.target.files.length > 0) {
-        handleImageUpload(e.target.files);
+        handleBatchImages(e.target.files);
       }
     });
 
-    async function handleImageUpload(fileList) {
+    async function handleBatchImages(fileList) {
       const files = Array.from(fileList);
-      showToast(`${files.length}개의 영화 스틸 이미지를 읽는 중...`);
+      showToast(`${files.length}개의 스틸컷 이미지를 로드하는 중...`);
 
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
         const dataUrl = await readFileAsDataURL(file);
         const imgObj = await loadImage(dataUrl);
 
-        // If card slot exists, replace image; otherwise append new
         if (state.cards[i]) {
           state.cards[i].imageSrc = dataUrl;
           state.cards[i].imgObj = imgObj;
@@ -1046,14 +1191,15 @@
             imageSrc: dataUrl,
             imgObj: imgObj,
             quote: "기자들의 극찬 릴레이! 압도적 몰입감의 웰메이드 스릴러",
-            byline: "영화전문 리뷰어",
+            byline: "영화 매체 리뷰어",
             rating: 5
           });
         }
       }
-      updateUI();
+      renderCardsList();
       renderCurrentCard();
-      showToast("이미지 업로드가 완료되었습니다.");
+      saveStateToStorage();
+      showToast("스틸컷 업로드가 완료되었습니다.");
     }
 
     function readFileAsDataURL(file) {
@@ -1064,28 +1210,39 @@
       });
     }
 
-    // Parse pasted reviews text
     document.getElementById('btnParseReviews').addEventListener('click', () => {
       const raw = bulkQuotesInput.value;
       if (!raw.trim()) {
         showToast("붙여넣은 리뷰 문구가 없습니다.");
         return;
       }
-      const parsed = parseReviewsText(raw);
-      if (parsed.length === 0) return;
+      const blocks = raw.split(/\n\s*\n/).map(b => b.trim()).filter(Boolean);
+      const parsed = [];
+
+      blocks.forEach(block => {
+        const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
+        if (lines.length === 1) {
+          if (lines[0].includes(' - ')) {
+            const p = lines[0].split(' - ');
+            parsed.push({ quote: p[0].trim(), byline: p[1].trim() });
+          } else {
+            parsed.push({ quote: lines[0], byline: "언론 리뷰" });
+          }
+        } else if (lines.length >= 2) {
+          parsed.push({ quote: lines[0], byline: lines[1] });
+        }
+      });
 
       parsed.forEach((item, idx) => {
         if (state.cards[idx]) {
           state.cards[idx].quote = item.quote;
           state.cards[idx].byline = item.byline;
         } else {
-          // If more quotes than current images, recycle first image
-          const baseImgSrc = state.cards[0] ? state.cards[0].imageSrc : SAMPLE_IMAGE_URLS[0];
-          const baseImgObj = state.cards[0] ? state.cards[0].imgObj : null;
+          const fallbackSrc = state.cards[0] ? state.cards[0].imageSrc : DEFAULT_STILLS[0];
           state.cards.push({
             id: 'card_' + Date.now() + '_' + idx,
-            imageSrc: baseImgSrc,
-            imgObj: baseImgObj,
+            imageSrc: fallbackSrc,
+            imgObj: null,
             quote: item.quote,
             byline: item.byline,
             rating: 5
@@ -1093,72 +1250,188 @@
         }
       });
 
-      updateUI();
-      renderCurrentCard();
-      showToast(`${parsed.length}개의 리뷰 문구가 카드에 매칭되었습니다.`);
+      // Reload images for new cards
+      Promise.all(state.cards.map(async c => {
+        if (!c.imgObj) c.imgObj = await loadImage(c.imageSrc);
+      })).then(() => {
+        renderCardsList();
+        renderCurrentCard();
+        saveStateToStorage();
+        showToast(`${parsed.length}개의 리뷰 문구가 카드에 반영되었습니다.`);
+      });
     });
 
-    document.getElementById('btnLoadSample').addEventListener('click', initSampleData);
+    const tabBtnCards = document.getElementById('tabBtnCards');
+    const tabBtnBatch = document.getElementById('tabBtnBatch');
+    const tabBtnStyle = document.getElementById('tabBtnStyle');
+    const tabContentCards = document.getElementById('tabContentCards');
+    const tabContentBatch = document.getElementById('tabContentBatch');
+    const tabContentStyle = document.getElementById('tabContentStyle');
 
-    // Preview scale dropdown
-    document.getElementById('previewScale').addEventListener('change', (e) => {
-      const val = e.target.value;
-      if (val === 'auto') {
+    function setActiveTab(btn, content) {
+      [tabBtnCards, tabBtnBatch, tabBtnStyle].forEach(b => {
+        b.className = 'flex-1 py-2.5 text-xs font-semibold border-b-2 border-transparent text-gray-400 hover:text-gray-200 flex items-center justify-center gap-1.5 transition';
+      });
+      [tabContentCards, tabContentBatch, tabContentStyle].forEach(c => c.classList.add('hidden'));
+
+      btn.className = 'flex-1 py-2.5 text-xs font-bold border-b-2 border-gold-400 text-gold-400 flex items-center justify-center gap-1.5 transition';
+      content.classList.remove('hidden');
+    }
+
+    tabBtnCards.onclick = () => setActiveTab(tabBtnCards, tabContentCards);
+    tabBtnBatch.onclick = () => setActiveTab(tabBtnBatch, tabContentBatch);
+    tabBtnStyle.onclick = () => setActiveTab(tabBtnStyle, tabContentStyle);
+
+    // Title / Credits sync
+    topMovieTitle.addEventListener('input', (e) => {
+      state.projectTitle = e.target.value;
+      renderCurrentCard();
+      saveStateToStorage();
+    });
+    document.getElementById('inputFestivalBadge').addEventListener('input', (e) => {
+      state.common.festivalBadge = e.target.value;
+      renderCurrentCard();
+      saveStateToStorage();
+    });
+    document.getElementById('inputMovieCredits').addEventListener('input', (e) => {
+      state.common.credits = e.target.value;
+      renderCurrentCard();
+      saveStateToStorage();
+    });
+
+    // Style listeners
+    document.querySelectorAll('.ratio-btn').forEach(btn => {
+      btn.onclick = () => {
+        state.ratio = btn.dataset.ratio;
+        applyStyleValuesToInputs();
+        renderCurrentCard();
+        saveStateToStorage();
+      };
+    });
+
+    document.getElementById('fontFamilySelect').onchange = (e) => {
+      state.style.fontFamily = e.target.value;
+      renderCurrentCard();
+      saveStateToStorage();
+    };
+    document.getElementById('valignSelect').onchange = (e) => {
+      state.style.valign = e.target.value;
+      renderCurrentCard();
+      saveStateToStorage();
+    };
+    document.getElementById('quoteSizeSlider').oninput = (e) => {
+      state.style.quoteSize = e.target.value;
+      document.getElementById('quoteSizeVal').innerText = e.target.value + 'px';
+      renderCurrentCard();
+      saveStateToStorage();
+    };
+    document.getElementById('maskOpacitySlider').oninput = (e) => {
+      state.style.maskOpacity = e.target.value / 100;
+      document.getElementById('maskOpacityValue').innerText = e.target.value + '%';
+      renderCurrentCard();
+      saveStateToStorage();
+    };
+    document.getElementById('checkVignette').onchange = (e) => {
+      state.style.vignette = e.target.checked;
+      renderCurrentCard();
+      saveStateToStorage();
+    };
+    document.getElementById('checkDualFade').onchange = (e) => {
+      state.style.dualFade = e.target.checked;
+      renderCurrentCard();
+      saveStateToStorage();
+    };
+    document.getElementById('accentColorPicker').oninput = (e) => {
+      state.style.accentColor = e.target.value;
+      renderCurrentCard();
+      saveStateToStorage();
+    };
+    document.getElementById('decoSelect').onchange = (e) => {
+      state.style.decoration = e.target.value;
+      renderCurrentCard();
+      saveStateToStorage();
+    };
+
+    // Navigation buttons
+    document.getElementById('btnPrevCard').onclick = () => {
+      if (state.cards.length === 0) return;
+      state.currentIndex = (state.currentIndex - 1 + state.cards.length) % state.cards.length;
+      renderCardsList();
+      renderCurrentCard();
+    };
+    document.getElementById('btnNextCard').onclick = () => {
+      if (state.cards.length === 0) return;
+      state.currentIndex = (state.currentIndex + 1) % state.cards.length;
+      renderCardsList();
+      renderCurrentCard();
+    };
+
+    document.getElementById('btnForceSave').onclick = () => {
+      saveStateToStorage();
+      showToast("브라우저 로컬 저장소에 작업이 저장되었습니다.");
+    };
+
+    document.getElementById('btnResetAll').onclick = async () => {
+      localStorage.clear();
+      await loadDefaultSampleData();
+      renderCardsList();
+      renderCurrentCard();
+      showToast("기본 샘플 데이터로 초기화되었습니다.");
+    };
+
+    // Download Single PNG
+    document.getElementById('btnDownloadSingle').onclick = () => {
+      if (state.cards.length === 0) return;
+      renderCurrentCard();
+      const safeTitle = (state.projectTitle || 'Movie').replace(/[/\\?%*:|"<>]/g, '_');
+      const link = document.createElement('a');
+      link.download = `${safeTitle}_Card_${state.currentIndex + 1}.png`;
+      link.href = canvas.toDataURL('image/png', 0.95);
+      link.click();
+      showToast(`카드 #${state.currentIndex + 1} PNG 다운로드 완료`);
+    };
+
+    // Bulk ZIP Export
+    document.getElementById('btnDownloadAllZip').onclick = async () => {
+      if (state.cards.length === 0) return;
+      showToast("전체 고해상도 ZIP 압축을 시작합니다...");
+
+      const zip = new JSZip();
+      const safeTitle = (state.projectTitle || 'Movie').replace(/[/\\?%*:|"<>]/g, '_');
+      const folder = zip.folder(`${safeTitle}_Review_Cards`);
+      const origIndex = state.currentIndex;
+
+      for (let i = 0; i < state.cards.length; i++) {
+        state.currentIndex = i;
+        renderCurrentCard();
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
+        const base64Data = dataUrl.replace(/^data:image\/(png|jpeg);base64,/, "");
+        folder.file(`${safeTitle}_Card_${String(i + 1).padStart(2, '0')}.jpg`, base64Data, { base64: true });
+      }
+
+      state.currentIndex = origIndex;
+      renderCurrentCard();
+
+      const content = await zip.generateAsync({ type: 'blob' });
+      saveAs(content, `${safeTitle}_Review_Cards.zip`);
+      showToast(`총 ${state.cards.length}장의 카드가 ZIP으로 다운로드되었습니다!`);
+    };
+
+    // Scale helper
+    document.getElementById('previewScale').onchange = (e) => {
+      const v = e.target.value;
+      if (v === 'auto') {
         canvas.style.transform = 'none';
         canvas.classList.add('max-h-[70vh]', 'max-w-full');
       } else {
         canvas.classList.remove('max-h-[70vh]', 'max-w-full');
-        canvas.style.transform = `scale(${val})`;
+        canvas.style.transform = `scale(${v})`;
         canvas.style.transformOrigin = 'center center';
       }
-    });
+    };
 
-    document.getElementById('btnDownloadSingle').addEventListener('click', () => {
-      if (state.cards.length === 0) return;
-      renderCurrentCard();
-      const link = document.createElement('a');
-      link.download = `${state.common.movieTitle || 'Review'}_Card_${state.currentIndex + 1}.png`;
-      link.href = canvas.toDataURL('image/png', 0.95);
-      link.click();
-      showToast(`카드 #${state.currentIndex + 1} 다운로드가 완료되었습니다.`);
-    });
-
-    document.getElementById('btnDownloadAllZip').addEventListener('click', async () => {
-      if (state.cards.length === 0) {
-        showToast("다운로드할 카드가 없습니다.");
-        return;
-      }
-
-      showToast("고해상도 카드뉴스 ZIP 압축을 시작합니다...");
-      const zip = new JSZip();
-      const folderName = `${state.common.movieTitle || 'Movie'}_Review_Cards_${state.ratio}`;
-      const imgFolder = zip.folder(folderName);
-
-      const origIndex = state.currentIndex;
-
-      // Render each card quietly onto canvas and export blob
-      for (let i = 0; i < state.cards.length; i++) {
-        state.currentIndex = i;
-        renderCurrentCard();
-
-        const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
-        const base64Data = dataUrl.replace(/^data:image\/(png|jpeg);base64,/, "");
-        imgFolder.file(`card_${String(i + 1).padStart(2, '0')}.jpg`, base64Data, { base64: true });
-      }
-
-      // Restore original index
-      state.currentIndex = origIndex;
-      renderCurrentCard();
-
-      const zipBlob = await zip.generateAsync({ type: 'blob' });
-      saveAs(zipBlob, `${folderName}.zip`);
-      showToast(`총 ${state.cards.length}장의 카드뉴스가 ZIP 파일로 저장되었습니다!`);
-    });
-
-    window.addEventListener('DOMContentLoaded', () => {
-      initSampleData();
-      lucide.createIcons();
-    });
+    // Run on startup
+    window.addEventListener('DOMContentLoaded', initializeApp);
   </script>
 </body>
 </html>
