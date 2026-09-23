@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CineQuote Studio - 영화 리뷰 카드뉴스 & 포스터 메이커</title>
+  <title>CineQuote Studio - 영화 리뷰 카드뉴스 & 종합 리뷰포스터 메이커</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -55,20 +55,10 @@
       background-size: 20px 20px;
       background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
     }
-    .draggable-card {
-      cursor: grab;
-      user-select: none;
-    }
-    .draggable-card:active {
-      cursor: grabbing;
-    }
-    .draggable-card.dragging {
-      opacity: 0.45;
-      border: 1px dashed #fbbf24;
-    }
-    .draggable-card.drag-over {
-      border-top: 2px solid #fbbf24;
-    }
+    .draggable-card { cursor: grab; user-select: none; }
+    .draggable-card:active { cursor: grabbing; }
+    .draggable-card.dragging { opacity: 0.45; border: 1px dashed #fbbf24; }
+    .draggable-card.drag-over { border-top: 2px solid #fbbf24; }
   </style>
 </head>
 <body class="bg-cinema-950 text-gray-100 font-sans min-h-screen flex flex-col antialiased selection:bg-gold-500 selection:text-black">
@@ -81,7 +71,7 @@
       <div>
         <div class="flex items-center gap-2">
           <span class="text-base font-extrabold text-white tracking-tight">CineQuote</span>
-          <span class="text-[10px] px-1.5 py-0.5 rounded bg-gold-500/20 text-gold-400 font-bold border border-gold-500/30">PRO v2.5</span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-gold-500/20 text-gold-400 font-bold border border-gold-500/30">PRO v2.8</span>
           <span id="saveStatusBadge" class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
             <i data-lucide="check" class="w-3 h-3"></i> 준비 완료
           </span>
@@ -89,25 +79,37 @@
       </div>
     </div>
 
-    <!-- Top Project Title Input -->
-    <div class="flex-1 max-w-md min-w-[240px] flex items-center gap-2 bg-cinema-850 px-3 py-1.5 rounded-lg border border-cinema-700/90 focus-within:border-gold-400">
+    <!-- 프로젝트 타이틀 -->
+    <div class="flex-1 max-w-sm min-w-[200px] flex items-center gap-2 bg-cinema-850 px-3 py-1.5 rounded-lg border border-cinema-700/90 focus-within:border-gold-400">
       <i data-lucide="film" class="w-4 h-4 text-gold-400 flex-shrink-0"></i>
       <div class="flex-1">
-        <span class="text-[10px] text-gray-400 block font-medium">프로젝트 / 영화 타이틀 (파일명 반영)</span>
+        <span class="text-[10px] text-gray-400 block font-medium">프로젝트 / 영화 타이틀</span>
         <input type="text" id="topMovieTitle" placeholder="영화 제목을 입력하세요" class="w-full bg-transparent text-xs font-bold text-white focus:outline-none placeholder-gray-500">
       </div>
     </div>
 
-    <!-- Top Action Buttons -->
+    <!-- 상단 액션 버튼들 -->
     <div class="flex items-center gap-2 flex-wrap">
-      <button id="btnSetDirectory" class="px-2.5 py-1.5 text-xs font-medium text-emerald-300 bg-emerald-950/40 hover:bg-emerald-900/60 border border-emerald-600/40 rounded-lg transition flex items-center gap-1.5" title="내 PC 로컬 폴더(예: C:/wowquote)를 연결하여 자동 저장">
+      <!-- 백업 저장 / 불러오기 (USB / 노트북 / 추가 리뷰 연동용) -->
+      <button id="btnExportJson" class="px-2.5 py-1.5 text-xs font-semibold text-gray-200 bg-cinema-800 hover:bg-cinema-700 border border-cinema-600 rounded-lg transition flex items-center gap-1" title="작업 데이터를 파일로 저장">
+        <i data-lucide="save" class="w-3.5 h-3.5 text-gold-400"></i>
+        <span>백업 저장(JSON)</span>
+      </button>
+
+      <button id="btnImportJson" class="px-2.5 py-1.5 text-xs font-semibold text-gray-200 bg-cinema-800 hover:bg-cinema-700 border border-cinema-600 rounded-lg transition flex items-center gap-1" title="저장해둔 JSON 불러오기">
+        <i data-lucide="folder-open" class="w-3.5 h-3.5 text-gold-400"></i>
+        <span>불러오기</span>
+      </button>
+      <input type="file" id="importJsonInput" accept=".json" class="hidden">
+
+      <button id="btnSetDirectory" class="px-2.5 py-1.5 text-xs font-medium text-emerald-300 bg-emerald-950/40 hover:bg-emerald-900/60 border border-emerald-600/40 rounded-lg transition flex items-center gap-1.5" title="C:/wowquote 폴더 연동">
         <i data-lucide="folder-cog" class="w-3.5 h-3.5"></i>
-        <span id="dirNameDisplay">로컬 폴더 지정 (C:/wowquote)</span>
+        <span id="dirNameDisplay">로컬 폴더 연결</span>
       </button>
 
       <button id="btnSaveToDir" class="hidden px-2.5 py-1.5 text-xs font-bold text-emerald-900 bg-emerald-400 hover:bg-emerald-300 rounded-lg transition flex items-center gap-1 shadow-sm">
         <i data-lucide="folder-down" class="w-3.5 h-3.5"></i>
-        <span>폴더에 바로 저장</span>
+        <span>폴더 일괄저장</span>
       </button>
 
       <button id="btnDownloadSingle" class="px-2.5 py-1.5 text-xs font-semibold text-white bg-cinema-800 hover:bg-cinema-700 border border-cinema-600 rounded-lg transition flex items-center gap-1.5">
@@ -130,10 +132,13 @@
       <!-- Tabs -->
       <div class="flex border-b border-cinema-700 bg-cinema-950/80 sticky top-0 z-20">
         <button id="tabBtnBatch" class="flex-1 py-2.5 text-xs font-bold border-b-2 border-gold-400 text-gold-400 flex items-center justify-center gap-1.5 transition">
-          <i data-lucide="file-text" class="w-3.5 h-3.5"></i> 1. 문구·스틸 일괄 추가
+          <i data-lucide="file-text" class="w-3.5 h-3.5"></i> 1. 문구·스틸 일괄
         </button>
         <button id="tabBtnCards" class="flex-1 py-2.5 text-xs font-semibold border-b-2 border-transparent text-gray-400 hover:text-gray-200 flex items-center justify-center gap-1.5 transition">
-          <i data-lucide="list-ordered" class="w-3.5 h-3.5"></i> 2. 카드 관리 & 순서
+          <i data-lucide="list-ordered" class="w-3.5 h-3.5"></i> 2. 카드 목록·순서
+        </button>
+        <button id="tabBtnReviewPoster" class="flex-1 py-2.5 text-xs font-semibold border-b-2 border-transparent text-gray-400 hover:text-gray-200 flex items-center justify-center gap-1.5 transition">
+          <i data-lucide="newspaper" class="w-3.5 h-3.5"></i> ★ 리뷰포스터(종합)
         </button>
         <button id="tabBtnStyle" class="flex-1 py-2.5 text-xs font-semibold border-b-2 border-transparent text-gray-400 hover:text-gray-200 flex items-center justify-center gap-1.5 transition">
           <i data-lucide="palette" class="w-3.5 h-3.5"></i> 3. 디자인 스타일
@@ -169,7 +174,7 @@
           <div id="dropZone" class="border-2 border-dashed border-cinema-700 hover:border-gold-400 bg-cinema-850/60 hover:bg-cinema-850 rounded-xl p-4 text-center cursor-pointer transition flex flex-col items-center justify-center gap-1.5">
             <input type="file" id="imageInput" multiple accept="image/*" class="hidden">
             <i data-lucide="upload-cloud" class="w-6 h-6 text-gold-400"></i>
-            <p class="text-xs font-medium text-gray-200">새 스틸컷들을 드래그하거나 클릭하여 추가</p>
+            <p class="text-xs font-medium text-gray-200">스틸컷들을 드래그하거나 클릭하여 추가</p>
             <p class="text-[10px] text-gray-400">사진이 적으면 1-2-3-1-2-3 순서로 자동 순환 매칭됩니다.</p>
           </div>
         </div>
@@ -180,14 +185,21 @@
             <span class="text-xs font-bold text-gray-300 flex items-center gap-1.5">
               <i data-lucide="file-input" class="w-3.5 h-3.5 text-gold-400"></i> 리뷰 문구 일괄 붙여넣기
             </span>
-            <button id="btnParseReviews" class="px-2.5 py-1 text-xs font-bold text-black bg-gold-400 hover:bg-gold-300 rounded flex items-center gap-1 transition">
-              <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> 문구 목록으로 카드 생성
-            </button>
+            <div class="flex items-center gap-1">
+              <button id="btnAppendReviews" class="px-2 py-1 text-[11px] font-semibold text-gray-200 bg-cinema-800 hover:bg-cinema-700 border border-cinema-600 rounded transition" title="기존 카드 뒤에 새로 추가">
+                + 뒤에 덧붙이기
+              </button>
+              <button id="btnParseReviews" class="px-2.5 py-1 text-xs font-bold text-black bg-gold-400 hover:bg-gold-300 rounded flex items-center gap-1 transition">
+                <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> 새 목록으로 생성
+              </button>
+            </div>
           </div>
           <p class="text-[11px] text-gray-400">
-            문장 끝에 <span class="text-gold-400 font-bold">- 매체 기자 -</span> 형식으로 입력하면 본문과 매체·기자명이 자동 분리됩니다.
+            문장 끝에 <span class="text-gold-400 font-bold">- 매체 기자 -</span> 형식으로 넣으면 긴 문장도 깔끔하게 분리되며 화면 70%를 넘지 않게 자동 축소됩니다.
           </p>
-          <textarea id="bulkQuotesInput" rows="10" class="w-full bg-cinema-850 border border-cinema-700 rounded-xl p-3 text-xs font-sans text-gray-200 focus:border-gold-400 focus:outline-none leading-relaxed placeholder-gray-600 resize-y" placeholder="여름 극장가에 딱 어울리는 스파이더맨이 돌아왔다&#10;- 매일경제 스타투데이 양소영 기자 -&#10;&#10;이보다 완벽할 수 없는 시리즈의 귀환. 5년의 기다림이 아깝지 않다&#10;무조건 극장에서 봐야만 한다&#10;- 조이뉴스24 박진영 기자 -"></textarea>
+          <textarea id="bulkQuotesInput" rows="10" class="w-full bg-cinema-850 border border-cinema-700 rounded-xl p-3 text-xs font-sans text-gray-200 focus:border-gold-400 focus:outline-none leading-relaxed placeholder-gray-600 resize-y" placeholder="문장이 여러 줄로 길어도 됩니다.
+타인의 고통에 대한 이해보다 이미지의 소유 행위에 가깝다.
+- 매체명 기자명 -"></textarea>
         </div>
       </div>
 
@@ -211,8 +223,52 @@
           </div>
         </div>
 
-        <div id="cardsListContainer" class="space-y-2.5">
-          <!-- Populated via JS -->
+        <div id="cardsListContainer" class="space-y-2.5"></div>
+      </div>
+
+      <!-- TAB: 종합 리뷰 포스터 (전체 리뷰를 한 장의 메인 포스터로 생성) -->
+      <div id="tabContentReviewPoster" class="flex-1 overflow-y-auto p-4 space-y-4 hidden">
+        <div class="bg-cinema-850 p-3.5 rounded-xl border border-gold-500/40 space-y-3">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xs font-bold text-gold-400 flex items-center gap-1.5">
+              <i data-lucide="layout-grid" class="w-4 h-4"></i> 영화 리뷰 종합 포스터 모드
+            </h3>
+            <span class="text-[10px] bg-gold-500/20 text-gold-300 px-1.5 py-0.5 rounded border border-gold-500/30">별개 모드</span>
+          </div>
+          <p class="text-[11px] text-gray-300 leading-relaxed">
+            등록된 모든 리뷰를 1장의 포스터에 모아 출력합니다. 대표 스틸컷 1장을 지정해 배경으로 깔고 모든 매체평을 한 번에 보여줍니다.
+          </p>
+          
+          <div class="pt-1">
+            <span class="text-[10px] text-gray-400 block mb-1 font-semibold">리뷰 포스터 메인 배경 이미지 선택</span>
+            <div class="flex items-center gap-2">
+              <input type="file" id="posterMainImageInput" accept="image/*" class="hidden">
+              <button onclick="document.getElementById('posterMainImageInput').click()" class="px-3 py-1.5 rounded bg-cinema-800 hover:bg-cinema-700 border border-cinema-600 text-xs font-semibold text-white flex items-center gap-1.5">
+                <i data-lucide="image" class="w-3.5 h-3.5 text-gold-400"></i> 대표 배경 이미지 업로드
+              </button>
+              <span id="posterMainImageName" class="text-[11px] text-gray-400 truncate max-w-[180px]">등록 안 됨 (1번 스틸 자동 사용)</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 pt-1">
+            <div>
+              <span class="text-[10px] text-gray-400 block mb-1">리뷰 배열 방식</span>
+              <select id="posterLayoutCols" class="w-full bg-cinema-900 border border-cinema-700 rounded p-1.5 text-xs text-white">
+                <option value="2" selected>2열 배치 (추천)</option>
+                <option value="1">1열 집중 나열</option>
+                <option value="3">3열 조밀 배치</option>
+              </select>
+            </div>
+            <div>
+              <span class="text-[10px] text-gray-400 block mb-1">포스터 글자 크기</span>
+              <input type="range" id="posterFontSizeSlider" min="14" max="32" value="20" class="w-full accent-gold-400 cursor-pointer">
+              <span id="posterFontSizeVal" class="text-[10px] text-gold-400 font-mono">20px</span>
+            </div>
+          </div>
+
+          <button id="btnSwitchToPosterMode" class="w-full py-2 bg-gradient-to-r from-gold-500 to-amber-600 hover:brightness-110 text-black font-extrabold text-xs rounded-lg transition shadow-md flex items-center justify-center gap-1.5">
+            <i data-lucide="eye" class="w-4 h-4"></i> 종합 리뷰 포스터로 캔버스 전환
+          </button>
         </div>
       </div>
 
@@ -222,13 +278,13 @@
         <!-- Ratio Selector -->
         <div class="bg-cinema-850 p-3 rounded-xl border border-cinema-700 space-y-2">
           <span class="text-xs font-bold text-gray-200 flex items-center justify-between">
-            <span>규격 / 캔버스 종횡비</span>
+            <span>규격 / 캔버스 종횡비 (디폴트: 가로 스틸)</span>
             <span id="resolutionBadge" class="text-[11px] font-mono text-gold-400">1280 × 720 px</span>
           </span>
           <div class="grid grid-cols-3 gap-2 text-xs">
             <button data-ratio="landscape" class="ratio-btn active border border-gold-400 bg-gold-400/15 text-white font-semibold py-2 px-1 rounded-lg flex flex-col items-center gap-1">
               <span class="w-5 h-3 border-2 border-gold-400 rounded-sm"></span>
-              <span>가로 스틸형</span>
+              <span>가로 스틸형 (기본)</span>
               <span class="text-[9px] text-gray-400">16:9 (1280×720)</span>
             </button>
             <button data-ratio="poster" class="ratio-btn border border-cinema-700 bg-cinema-900 text-gray-300 hover:text-white font-medium py-2 px-1 rounded-lg flex flex-col items-center gap-1">
@@ -246,7 +302,7 @@
 
         <!-- Typography & Layout -->
         <div class="bg-cinema-850 p-3 rounded-xl border border-cinema-700 space-y-3">
-          <h4 class="text-xs font-bold text-gray-200">폰트 및 크기/배치</h4>
+          <h4 class="text-xs font-bold text-gray-200">폰트 및 기본 기준 크기</h4>
           <div class="grid grid-cols-2 gap-2">
             <div>
               <span class="text-[10px] text-gray-400 block mb-1">서체 종류</span>
@@ -267,10 +323,10 @@
 
           <div class="space-y-1">
             <div class="flex justify-between text-[11px]">
-              <span class="text-gray-400">리뷰 헤드라인 글자 크기 (30px ~ 100px)</span>
-              <span id="quoteSizeVal" class="text-gold-400 font-mono">48px</span>
+              <span class="text-gray-400">리뷰 기준 폰트 크기 (긴 글은 70% 한도로 자동 축소)</span>
+              <span id="quoteSizeVal" class="text-gold-400 font-mono">46px</span>
             </div>
-            <input type="range" id="quoteSizeSlider" min="30" max="100" value="48" class="w-full accent-gold-400 cursor-pointer">
+            <input type="range" id="quoteSizeSlider" min="28" max="90" value="46" class="w-full accent-gold-400 cursor-pointer">
           </div>
 
           <div class="grid grid-cols-2 gap-2 pt-1">
@@ -329,10 +385,10 @@
       <!-- Left Bottom Reset -->
       <div class="p-3 border-t border-cinema-700/80 bg-cinema-950 flex items-center justify-between text-xs">
         <button id="btnResetAll" class="text-gray-400 hover:text-red-400 flex items-center gap-1 transition">
-          <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> 전체 초기화 (비우기)
+          <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> 전체 초기화
         </button>
         <button id="btnForceSave" class="text-gold-400 hover:underline flex items-center gap-1 transition">
-          <i data-lucide="save" class="w-3.5 h-3.5"></i> 수동 저장
+          <i data-lucide="save" class="w-3.5 h-3.5"></i> 브라우저 자동저장 확인
         </button>
       </div>
     </aside>
@@ -343,11 +399,14 @@
           <span class="text-xs font-semibold text-gray-300 flex items-center gap-1.5">
             <i data-lucide="eye" class="w-3.5 h-3.5 text-gold-400"></i> 미리보기
           </span>
-          <div class="flex items-center bg-cinema-850 border border-cinema-700 rounded-md text-xs px-2 py-0.5 text-gray-300 gap-2">
+          <div id="cardNavControls" class="flex items-center bg-cinema-850 border border-cinema-700 rounded-md text-xs px-2 py-0.5 text-gray-300 gap-2">
             <button id="btnPrevCard" class="hover:text-gold-400 font-bold px-1">&larr;</button>
             <span id="currentCardIndicator" class="text-gold-400 font-mono font-bold">0 / 0</span>
             <button id="btnNextCard" class="hover:text-gold-400 font-bold px-1">&rarr;</button>
           </div>
+          <span id="posterModeIndicator" class="hidden text-xs bg-gold-500/20 text-gold-400 border border-gold-500/30 px-2 py-0.5 rounded font-bold">
+            종합 리뷰 포스터 모드 표시 중
+          </span>
         </div>
 
         <div class="flex items-center gap-2">
@@ -369,16 +428,14 @@
       </div>
 
       <!-- Bottom Card Carousel -->
-      <div class="bg-cinema-900 border-t border-cinema-700/80 p-2 z-10">
+      <div id="carouselContainer" class="bg-cinema-900 border-t border-cinema-700/80 p-2 z-10">
         <div class="flex items-center justify-between mb-1 px-2">
           <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1">
-            <i data-lucide="film" class="w-3 h-3 text-gold-400"></i> 생성된 카드 덱 (<span id="totalCardsCount">0</span>장)
+            <i data-lucide="film" class="w-3 h-3 text-gold-400"></i> 생성된 개별 카드 (<span id="totalCardsCount">0</span>장)
           </span>
-          <span class="text-[10px] text-gray-400">하단 카드를 클릭하면 즉시 편집 화면으로 이동합니다</span>
+          <span class="text-[10px] text-gray-400">하단 카드를 클릭하면 즉시 해당 카드로 이동합니다</span>
         </div>
-        <div id="cardThumbnailStrip" class="flex gap-2 overflow-x-auto px-2 pb-1 scrollbar-thin">
-          <!-- Mini previews -->
-        </div>
+        <div id="cardThumbnailStrip" class="flex gap-2 overflow-x-auto px-2 pb-1 scrollbar-thin"></div>
       </div>
 
       <!-- Toast Alert Box -->
@@ -394,7 +451,8 @@
   <script>
     const state = {
       projectTitle: "",
-      ratio: 'landscape',
+      ratio: 'landscape', // 디폴트: 가로 스틸
+      viewMode: 'card',   // 'card' 또는 'poster' (종합 리뷰포스터)
       dimensions: {
         landscape: { width: 1280, height: 720, label: '1280 × 720 px' },
         poster: { width: 1000, height: 1500, label: '1000 × 1500 px' },
@@ -414,19 +472,25 @@
         boxBackdrop: false,
         textGlow: false,
         spotlight: false,
-        quoteSize: 48,
+        quoteSize: 46,
         accentColor: '#fbbf24',
         decoration: 'none'
+      },
+      posterConfig: {
+        mainImageSrc: null,
+        mainImgObj: null,
+        columns: 2,
+        fontSize: 20
       },
       currentIndex: 0,
       searchQuery: '',
       cards: [],
-      uploadedStillsPool: [], // 1-2-3 순환용 스틸컷 풀
+      uploadedStillsPool: [],
       dirHandle: null
     };
 
     const DB_NAME = 'CineQuoteStudioDB_Clean';
-    const DB_VERSION = 4;
+    const DB_VERSION = 5;
     const STORE_NAME = 'projects';
 
     function openDatabase() {
@@ -464,6 +528,11 @@
           ratio: state.ratio,
           common: state.common,
           style: state.style,
+          posterConfig: {
+            mainImageSrc: state.posterConfig.mainImageSrc,
+            columns: state.posterConfig.columns,
+            fontSize: state.posterConfig.fontSize
+          },
           currentIndex: state.currentIndex,
           cards: serializableCards,
           uploadedStillsPool: state.uploadedStillsPool
@@ -539,6 +608,16 @@
         state.style = Object.assign(state.style, saved.style || {});
         state.currentIndex = saved.currentIndex || 0;
         state.uploadedStillsPool = saved.uploadedStillsPool || [];
+        
+        if (saved.posterConfig) {
+          state.posterConfig.mainImageSrc = saved.posterConfig.mainImageSrc || null;
+          state.posterConfig.columns = saved.posterConfig.columns || 2;
+          state.posterConfig.fontSize = saved.posterConfig.fontSize || 20;
+          if (state.posterConfig.mainImageSrc) {
+            state.posterConfig.mainImgObj = await loadImage(state.posterConfig.mainImageSrc);
+            document.getElementById('posterMainImageName').innerText = '대표 이미지 등록됨';
+          }
+        }
 
         topMovieTitle.value = state.projectTitle;
         document.getElementById('inputFestivalBadge').value = state.common.festivalBadge;
@@ -565,7 +644,7 @@
       updateStillsPoolBadge();
       applyStyleValuesToInputs();
       renderCardsList();
-      renderCurrentCard();
+      renderCurrentCanvas();
       lucide.createIcons();
     }
 
@@ -602,7 +681,20 @@
       document.getElementById('resolutionBadge').innerText = state.dimensions[state.ratio].label;
     }
 
-    function renderCurrentCard() {
+    // 메인 라우터: 개별 카드 vs 종합 리뷰 포스터
+    function renderCurrentCanvas() {
+      if (state.viewMode === 'poster') {
+        renderReviewPoster();
+      } else {
+        renderIndividualCard();
+      }
+    }
+
+    // 1. 개별 카드 렌더러 (텍스트가 70%를 넘지 않도록 자동 축소 로직 내장)
+    function renderIndividualCard() {
+      document.getElementById('cardNavControls').classList.remove('hidden');
+      document.getElementById('posterModeIndicator').classList.add('hidden');
+      
       const dim = state.dimensions[state.ratio];
       canvas.width = dim.width;
       canvas.height = dim.height;
@@ -610,7 +702,6 @@
       if (!state.cards || state.cards.length === 0) {
         ctx.fillStyle = '#0f131a';
         ctx.fillRect(0, 0, dim.width, dim.height);
-        
         ctx.textAlign = 'center';
         ctx.fillStyle = '#475569';
         ctx.font = '600 28px "Noto Sans KR", sans-serif';
@@ -639,9 +730,257 @@
         renderTopFestivalBadge(ctx, state.common.festivalBadge, dim.width);
       }
 
-      renderQuoteSection(ctx, card, dim.width, dim.height);
+      renderQuoteSectionWithAutoFit(ctx, card, dim.width, dim.height);
       renderBottomBilling(ctx, dim.width, dim.height);
       updateCarouselUI();
+    }
+
+    // 텍스트 자동 축소(Auto-Fit) 엔진: 캔버스 높이의 65% 안에 맞춤
+    function renderQuoteSectionWithAutoFit(ctx, card, w, h) {
+      if (!card.quote && !card.byline) return;
+
+      ctx.save();
+      const isSerif = state.style.fontFamily === 'serif';
+      const quoteFont = isSerif ? '"Noto Serif KR", serif' : '"Noto Sans KR", sans-serif';
+      let fontSize = parseInt(state.style.quoteSize);
+      const minFontSize = 18; // 하한선
+      const maxAllowedHeight = h * 0.65; // 전체 화면의 65% 이내로 제한
+      const maxLineWidth = w * 0.84;
+
+      let lines = [];
+      let lineHeight = fontSize * 1.34;
+      let totalBlockHeight = 0;
+
+      // 텍스트가 화면 65% 안에 들어올 때까지 폰트 크기 자동 축소 루프
+      while (fontSize >= minFontSize) {
+        ctx.font = `900 ${fontSize}px ${quoteFont}`;
+        lineHeight = fontSize * 1.34;
+        
+        lines = [];
+        const rawParagraphs = (card.quote || '').split('\n');
+        rawParagraphs.forEach(p => {
+          const wrapped = wrapKoreanText(ctx, p.trim(), maxLineWidth);
+          if (wrapped.length > 0) lines.push(...wrapped);
+        });
+
+        totalBlockHeight = (lines.length * lineHeight) + (card.byline ? 36 : 0);
+
+        if (totalBlockHeight <= maxAllowedHeight) {
+          break;
+        }
+        fontSize -= 2; // 2px씩 줄이며 재계산
+      }
+
+      const align = state.style.align;
+      const valign = state.style.valign;
+
+      let startY;
+      if (valign === 'top') {
+        startY = h * 0.24;
+      } else if (valign === 'middle') {
+        startY = (h - totalBlockHeight) / 2 + fontSize;
+      } else {
+        startY = h - totalBlockHeight - (state.ratio === 'landscape' ? 70 : 110);
+      }
+
+      // Effect 1: 스포트라이트
+      if (state.style.spotlight) {
+        ctx.save();
+        const spotRadius = Math.max(w * 0.45, totalBlockHeight * 1.2);
+        const spotGrad = ctx.createRadialGradient(w / 2, startY + (totalBlockHeight / 2) - 10, 20, w / 2, startY + (totalBlockHeight / 2) - 10, spotRadius);
+        spotGrad.addColorStop(0, `rgba(5, 7, 10, ${Math.min(0.95, state.style.maskOpacity * 1.1)})`);
+        spotGrad.addColorStop(0.7, `rgba(5, 7, 10, ${state.style.maskOpacity * 0.6})`);
+        spotGrad.addColorStop(1, 'rgba(5, 7, 10, 0)');
+        ctx.fillStyle = spotGrad;
+        ctx.fillRect(0, 0, w, h);
+        ctx.restore();
+      }
+
+      // Effect 2: 박스 띠지
+      if (state.style.boxBackdrop && lines.length > 0) {
+        ctx.save();
+        let maxW = 0;
+        lines.forEach(l => {
+          const lw = ctx.measureText(l).width;
+          if (lw > maxW) maxW = lw;
+        });
+        const padX = fontSize * 0.7;
+        const padY = fontSize * 0.4;
+        const boxW = Math.min(w * 0.92, maxW + (padX * 2));
+        const boxH = totalBlockHeight + (padY * 2);
+        const boxX = (w - boxW) / 2;
+        const boxY = startY - fontSize - padY + 10;
+
+        ctx.fillStyle = `rgba(10, 14, 22, ${Math.min(0.92, state.style.maskOpacity * 1.05)})`;
+        ctx.strokeStyle = 'rgba(251, 191, 36, 0.25)';
+        ctx.lineWidth = 1;
+        roundRect(ctx, boxX, boxY, boxW, boxH, 12, true, true);
+        ctx.restore();
+      }
+
+      // 장식 옵션
+      if (state.style.decoration === 'stars') {
+        ctx.textAlign = 'center';
+        ctx.font = '900 24px sans-serif';
+        ctx.fillStyle = state.style.accentColor;
+        ctx.shadowColor = 'rgba(0,0,0,0.9)';
+        ctx.shadowBlur = 12;
+        ctx.fillText('★ ★ ★ ★ ★', w / 2, startY - (fontSize * 0.75));
+      } else if (state.style.decoration === 'quotes') {
+        ctx.textAlign = 'center';
+        ctx.font = '900 48px "Cinzel", serif';
+        ctx.fillStyle = state.style.accentColor;
+        ctx.shadowColor = 'rgba(0,0,0,0.9)';
+        ctx.shadowBlur = 12;
+        ctx.fillText('“', w / 2, startY - (fontSize * 0.45));
+      }
+
+      let startX = w / 2;
+      ctx.textAlign = align;
+      if (align === 'left') startX = w * 0.08;
+      if (align === 'right') startX = w * 0.92;
+
+      ctx.font = `900 ${fontSize}px ${quoteFont}`;
+
+      if (state.style.textGlow) {
+        ctx.shadowColor = state.style.accentColor;
+        ctx.shadowBlur = 24;
+        ctx.shadowOffsetY = 0;
+      } else {
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.98)';
+        ctx.shadowBlur = 18;
+        ctx.shadowOffsetY = 4;
+      }
+
+      lines.forEach((line, idx) => {
+        const lineY = startY + (idx * lineHeight);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillText(line, startX, lineY);
+      });
+
+      if (card.byline) {
+        const bylineY = startY + (lines.length * lineHeight) + 20;
+        ctx.shadowBlur = 8;
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
+        ctx.font = '500 18px "Noto Sans KR", sans-serif';
+        ctx.fillStyle = '#cbd5e1';
+        ctx.letterSpacing = '1px';
+        ctx.fillText(card.byline, startX, bylineY);
+      }
+
+      ctx.restore();
+    }
+
+    // 2. 별개 기능: 종합 리뷰 포스터 (모든 리뷰를 1장에 모아 렌더링)
+    function renderReviewPoster() {
+      document.getElementById('cardNavControls').classList.add('hidden');
+      document.getElementById('posterModeIndicator').classList.remove('hidden');
+
+      // 포스터는 세로(1000×1500)가 최적
+      const w = 1000;
+      const h = 1500;
+      canvas.width = w;
+      canvas.height = h;
+
+      // 대표 배경 이미지 우선, 없으면 1번 카드 스틸컷 사용
+      let bgImg = state.posterConfig.mainImgObj;
+      if (!bgImg && state.cards[0] && state.cards[0].imgObj) {
+        bgImg = state.cards[0].imgObj;
+      }
+
+      if (bgImg) {
+        drawImageCover(ctx, bgImg, 0, 0, w, h);
+      } else {
+        ctx.fillStyle = '#0a0d14';
+        ctx.fillRect(0, 0, w, h);
+      }
+
+      // 묵직한 포스터용 딤 마스크
+      ctx.fillStyle = 'rgba(5, 8, 14, 0.82)';
+      ctx.fillRect(0, 0, w, h);
+
+      // 상단 헤더
+      ctx.save();
+      ctx.textAlign = 'center';
+      if (state.common.festivalBadge) {
+        ctx.font = '600 16px "Noto Sans KR", sans-serif';
+        ctx.fillStyle = state.style.accentColor;
+        ctx.letterSpacing = '3px';
+        ctx.fillText(state.common.festivalBadge.toUpperCase(), w / 2, 70);
+      }
+
+      const title = state.projectTitle || 'REVIEW POSTER';
+      ctx.font = '900 52px "Noto Sans KR", sans-serif';
+      ctx.fillStyle = '#ffffff';
+      ctx.shadowColor = 'rgba(0,0,0,0.9)';
+      ctx.shadowBlur = 16;
+      ctx.fillText(title, w / 2, 140);
+
+      ctx.font = '700 16px "Cinzel", serif';
+      ctx.fillStyle = '#94a3b8';
+      ctx.letterSpacing = '6px';
+      ctx.fillText('CRITICS ACCLAIM & REVIEWS', w / 2, 175);
+      ctx.restore();
+
+      // 전체 리뷰 그리드 배치
+      const cols = parseInt(state.posterConfig.columns) || 2;
+      const pFontSize = parseInt(state.posterConfig.fontSize) || 20;
+      const gridTop = 220;
+      const gridBottom = h - 110;
+      const gridHeight = gridBottom - gridTop;
+      const gridWidth = w * 0.88;
+      const startX = (w - gridWidth) / 2;
+      const colWidth = (gridWidth - ((cols - 1) * 24)) / cols;
+
+      const total = state.cards.length;
+      if (total > 0) {
+        const perCol = Math.ceil(total / cols);
+        const rowHeight = gridHeight / perCol;
+
+        ctx.save();
+        ctx.font = `700 ${pFontSize}px "Noto Serif KR", serif`;
+        ctx.textAlign = 'left';
+
+        state.cards.forEach((c, idx) => {
+          const colIdx = Math.floor(idx / perCol);
+          const rowIdx = idx % perCol;
+          const boxX = startX + (colIdx * (colWidth + 24));
+          const boxY = gridTop + (rowIdx * rowHeight);
+
+          // 리뷰 카드 박스
+          ctx.fillStyle = 'rgba(15, 23, 42, 0.65)';
+          ctx.strokeStyle = 'rgba(251, 191, 36, 0.2)';
+          ctx.lineWidth = 1;
+          roundRect(ctx, boxX, boxY, colWidth, rowHeight - 12, 8, true, true);
+
+          // 리뷰 본문 (한두 줄로 간결 래핑)
+          ctx.fillStyle = '#f8fafc';
+          const pLines = wrapKoreanText(ctx, (c.quote || '').replace(/\n/g, ' '), colWidth - 24);
+          const maxLines = Math.min(3, pLines.length);
+          for (let l = 0; l < maxLines; l++) {
+            ctx.fillText(pLines[l], boxX + 12, boxY + 28 + (l * (pFontSize * 1.35)));
+          }
+
+          // 기자명
+          if (c.byline) {
+            ctx.fillStyle = state.style.accentColor;
+            ctx.font = `600 13px "Noto Sans KR", sans-serif`;
+            ctx.fillText(`- ${c.byline}`, boxX + 12, boxY + rowHeight - 24);
+            ctx.font = `700 ${pFontSize}px "Noto Serif KR", serif`;
+          }
+        });
+        ctx.restore();
+      }
+
+      // 하단 크레딧
+      if (state.common.credits) {
+        ctx.save();
+        ctx.textAlign = 'center';
+        ctx.font = '500 15px "Noto Sans KR", sans-serif';
+        ctx.fillStyle = '#94a3b8';
+        ctx.fillText(state.common.credits, w / 2, h - 45);
+        ctx.restore();
+      }
     }
 
     function drawImageCover(ctx, img, x, y, w, h) {
@@ -711,127 +1050,6 @@
       ctx.restore();
     }
 
-    function renderQuoteSection(ctx, card, w, h) {
-      if (!card.quote && !card.byline) return;
-
-      ctx.save();
-      const isSerif = state.style.fontFamily === 'serif';
-      const quoteFont = isSerif ? '"Noto Serif KR", serif' : '"Noto Sans KR", sans-serif';
-      const fontSize = parseInt(state.style.quoteSize);
-      const align = state.style.align;
-      const valign = state.style.valign;
-
-      let startY;
-      if (valign === 'top') {
-        startY = h * 0.26;
-      } else if (valign === 'middle') {
-        startY = h * 0.44;
-      } else {
-        startY = state.ratio === 'landscape' ? h * 0.48 : h * 0.60;
-      }
-
-      const maxLineWidth = w * 0.84;
-      ctx.font = `900 ${fontSize}px ${quoteFont}`;
-      
-      // 줄바꿈 보존 텍스트 래핑
-      const rawParagraphs = (card.quote || '').split('\n');
-      const lines = [];
-      rawParagraphs.forEach(p => {
-        const wrapped = wrapKoreanText(ctx, p.trim(), maxLineWidth);
-        if (wrapped.length > 0) lines.push(...wrapped);
-      });
-
-      const lineHeight = fontSize * 1.34;
-      const totalBlockHeight = (lines.length * lineHeight) + (card.byline ? 36 : 0);
-
-      // Effect 1: 스포트라이트
-      if (state.style.spotlight) {
-        ctx.save();
-        const spotRadius = Math.max(w * 0.45, totalBlockHeight * 1.4);
-        const spotGrad = ctx.createRadialGradient(w / 2, startY + (totalBlockHeight / 2) - 10, 20, w / 2, startY + (totalBlockHeight / 2) - 10, spotRadius);
-        spotGrad.addColorStop(0, `rgba(5, 7, 10, ${Math.min(0.95, state.style.maskOpacity * 1.1)})`);
-        spotGrad.addColorStop(0.7, `rgba(5, 7, 10, ${state.style.maskOpacity * 0.6})`);
-        spotGrad.addColorStop(1, 'rgba(5, 7, 10, 0)');
-        ctx.fillStyle = spotGrad;
-        ctx.fillRect(0, 0, w, h);
-        ctx.restore();
-      }
-
-      // Effect 2: 박스 띠지
-      if (state.style.boxBackdrop && lines.length > 0) {
-        ctx.save();
-        let maxW = 0;
-        lines.forEach(l => {
-          const lw = ctx.measureText(l).width;
-          if (lw > maxW) maxW = lw;
-        });
-        const padX = fontSize * 0.7;
-        const padY = fontSize * 0.4;
-        const boxW = Math.min(w * 0.92, maxW + (padX * 2));
-        const boxH = totalBlockHeight + (padY * 2);
-        const boxX = (w - boxW) / 2;
-        const boxY = startY - fontSize - padY + 12;
-
-        ctx.fillStyle = `rgba(10, 14, 22, ${Math.min(0.92, state.style.maskOpacity * 1.05)})`;
-        ctx.strokeStyle = 'rgba(251, 191, 36, 0.25)';
-        ctx.lineWidth = 1;
-        roundRect(ctx, boxX, boxY, boxW, boxH, 12, true, true);
-        ctx.restore();
-      }
-
-      // 장식 옵션
-      if (state.style.decoration === 'stars') {
-        ctx.textAlign = 'center';
-        ctx.font = '900 24px sans-serif';
-        ctx.fillStyle = state.style.accentColor;
-        ctx.shadowColor = 'rgba(0,0,0,0.9)';
-        ctx.shadowBlur = 12;
-        ctx.fillText('★ ★ ★ ★ ★', w / 2, startY - (fontSize * 0.85));
-      } else if (state.style.decoration === 'quotes') {
-        ctx.textAlign = 'center';
-        ctx.font = '900 52px "Cinzel", serif';
-        ctx.fillStyle = state.style.accentColor;
-        ctx.shadowColor = 'rgba(0,0,0,0.9)';
-        ctx.shadowBlur = 12;
-        ctx.fillText('“', w / 2, startY - (fontSize * 0.5));
-      }
-
-      let startX = w / 2;
-      ctx.textAlign = align;
-      if (align === 'left') startX = w * 0.08;
-      if (align === 'right') startX = w * 0.92;
-
-      ctx.font = `900 ${fontSize}px ${quoteFont}`;
-
-      if (state.style.textGlow) {
-        ctx.shadowColor = state.style.accentColor;
-        ctx.shadowBlur = 28;
-        ctx.shadowOffsetY = 0;
-      } else {
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.98)';
-        ctx.shadowBlur = 18;
-        ctx.shadowOffsetY = 4;
-      }
-
-      lines.forEach((line, idx) => {
-        const lineY = startY + (idx * lineHeight);
-        ctx.fillStyle = '#ffffff';
-        ctx.fillText(line, startX, lineY);
-      });
-
-      if (card.byline) {
-        const bylineY = startY + (lines.length * lineHeight) + 24;
-        ctx.shadowBlur = 8;
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
-        ctx.font = '500 20px "Noto Sans KR", sans-serif';
-        ctx.fillStyle = '#cbd5e1';
-        ctx.letterSpacing = '1px';
-        ctx.fillText(card.byline, startX, bylineY);
-      }
-
-      ctx.restore();
-    }
-
     function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
       ctx.beginPath();
       ctx.moveTo(x + radius, y);
@@ -875,7 +1093,6 @@
       if (!title && !credits) return;
 
       ctx.save();
-
       if (state.ratio === 'landscape') {
         ctx.font = '800 24px "Noto Sans KR", sans-serif';
         ctx.fillStyle = '#ffffff';
@@ -933,13 +1150,12 @@
       }
 
       filteredCards.forEach(({ card, originalIndex }) => {
-        const isCurrent = originalIndex === state.currentIndex;
+        const isCurrent = originalIndex === state.currentIndex && state.viewMode === 'card';
         const cardEl = document.createElement('div');
         cardEl.draggable = true;
         cardEl.dataset.index = originalIndex;
         cardEl.className = `draggable-card p-3 rounded-xl border transition space-y-2.5 ${isCurrent ? 'bg-cinema-800/90 border-gold-400 ring-1 ring-gold-400/40' : 'bg-cinema-850/80 border-cinema-700/80 hover:border-cinema-600'}`;
 
-        // 드래그 앤 드롭
         cardEl.addEventListener('dragstart', (e) => {
           draggedIndex = originalIndex;
           cardEl.classList.add('dragging');
@@ -978,7 +1194,7 @@
           }
 
           renderCardsList();
-          renderCurrentCard();
+          renderCurrentCanvas();
           saveStateToStorage();
           showToast(`카드 순서가 변경되었습니다. (#${draggedIndex + 1} → #${originalIndex + 1})`);
           draggedIndex = null;
@@ -1042,7 +1258,8 @@
 
       state.cards.forEach((c, idx) => {
         const item = document.createElement('button');
-        item.className = `flex-shrink-0 px-2.5 py-1.5 rounded-lg border text-left transition flex items-center gap-2 max-w-[200px] ${idx === state.currentIndex ? 'border-gold-400 bg-gold-500/15 text-white ring-1 ring-gold-400/40' : 'border-cinema-700 bg-cinema-850 text-gray-400 hover:text-gray-200'}`;
+        const isActive = idx === state.currentIndex && state.viewMode === 'card';
+        item.className = `flex-shrink-0 px-2.5 py-1.5 rounded-lg border text-left transition flex items-center gap-2 max-w-[200px] ${isActive ? 'border-gold-400 bg-gold-500/15 text-white ring-1 ring-gold-400/40' : 'border-cinema-700 bg-cinema-850 text-gray-400 hover:text-gray-200'}`;
         item.onclick = () => selectCard(idx);
         item.innerHTML = `
           <span class="w-5 h-5 rounded bg-cinema-900 border border-cinema-700 font-bold text-[11px] flex items-center justify-center text-gold-400 flex-shrink-0">${idx + 1}</span>
@@ -1056,9 +1273,10 @@
     }
 
     window.selectCard = function(index) {
+      state.viewMode = 'card';
       state.currentIndex = index;
       renderCardsList();
-      renderCurrentCard();
+      renderCurrentCanvas();
     };
 
     window.deleteCard = function(index) {
@@ -1067,7 +1285,7 @@
         state.currentIndex = Math.max(0, state.cards.length - 1);
       }
       renderCardsList();
-      renderCurrentCard();
+      renderCurrentCanvas();
       saveStateToStorage();
       showToast("카드가 삭제되었습니다.");
     };
@@ -1075,7 +1293,7 @@
     window.updateCardQuote = function(index, val) {
       if (state.cards[index]) {
         state.cards[index].quote = val;
-        renderCurrentCard();
+        renderCurrentCanvas();
         saveStateToStorage();
       }
     };
@@ -1083,7 +1301,7 @@
     window.updateCardByline = function(index, val) {
       if (state.cards[index]) {
         state.cards[index].byline = val;
-        renderCurrentCard();
+        renderCurrentCanvas();
         saveStateToStorage();
       }
     };
@@ -1103,7 +1321,7 @@
         state.cards[cardToReplaceImageIndex].imgObj = imgObj;
         
         renderCardsList();
-        renderCurrentCard();
+        renderCurrentCanvas();
         saveStateToStorage();
         showToast(`카드 #${cardToReplaceImageIndex + 1} 스틸컷이 교체되었습니다.`);
         cardToReplaceImageIndex = null;
@@ -1111,9 +1329,7 @@
     });
 
     document.getElementById('btnAddNewCard').addEventListener('click', () => {
-      // 새 카드 추가 시에도 스틸 풀이 있으면 순환 할당
       let defaultImgSrc = null;
-      let defaultImgObj = null;
       if (state.uploadedStillsPool.length > 0) {
         defaultImgSrc = state.uploadedStillsPool[state.cards.length % state.uploadedStillsPool.length];
       }
@@ -1127,9 +1343,10 @@
           byline: "",
           rating: 5
         });
+        state.viewMode = 'card';
         state.currentIndex = state.cards.length - 1;
         renderCardsList();
-        renderCurrentCard();
+        renderCurrentCanvas();
         saveStateToStorage();
         showToast("새 카드가 추가되었습니다.");
       });
@@ -1140,14 +1357,14 @@
       renderCardsList();
     });
 
-    // File System Access API: 로컬 C:/wowquote 폴더 직접 저장 연동
+    // 로컬 폴더 직접 저장 (File System Access API)
     const btnSetDirectory = document.getElementById('btnSetDirectory');
     const btnSaveToDir = document.getElementById('btnSaveToDir');
     const dirNameDisplay = document.getElementById('dirNameDisplay');
 
     btnSetDirectory.addEventListener('click', async () => {
       if (!('showDirectoryPicker' in window)) {
-        showToast("현재 브라우저는 로컬 폴더 직접 저장을 지원하지 않습니다.");
+        showToast("현재 브라우저는 폴더 직접 저장을 지원하지 않습니다.");
         return;
       }
 
@@ -1181,11 +1398,13 @@
 
       showToast("로컬 폴더에 이미지 파일들을 직접 저장하는 중...");
       const origIndex = state.currentIndex;
+      const origMode = state.viewMode;
+      state.viewMode = 'card';
 
       try {
         for (let i = 0; i < state.cards.length; i++) {
           state.currentIndex = i;
-          renderCurrentCard();
+          renderCurrentCanvas();
 
           const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.94));
           const safeTitle = (state.projectTitle || 'Review_Card').replace(/[/\\?%*:|"<>]/g, '_');
@@ -1197,15 +1416,27 @@
           await writable.close();
         }
 
+        // 포스터도 저장
+        state.viewMode = 'poster';
+        renderCurrentCanvas();
+        const posterBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.95));
+        const safeTitle = (state.projectTitle || 'Review_Card').replace(/[/\\?%*:|"<>]/g, '_');
+        const posterHandle = await state.dirHandle.getFileHandle(`${safeTitle}_Combined_Poster.jpg`, { create: true });
+        const pWritable = await posterHandle.createWritable();
+        await pWritable.write(posterBlob);
+        await pWritable.close();
+
+        state.viewMode = origMode;
         state.currentIndex = origIndex;
-        renderCurrentCard();
-        showToast(`총 ${state.cards.length}장의 이미지가 로컬 폴더에 저장되었습니다!`);
+        renderCurrentCanvas();
+        showToast(`카드 ${state.cards.length}장과 종합 포스터가 로컬 폴더에 저장되었습니다!`);
       } catch (err) {
         console.error(err);
-        showToast("폴더 쓰기 권한이 없거나 저장에 실패했습니다.");
+        showToast("폴더 저장 중 오류가 발생했습니다.");
       }
     });
 
+    // 다중 이미지 드래그앤드롭 & 순환 풀 등록
     const dropZone = document.getElementById('dropZone');
     const imageInput = document.getElementById('imageInput');
     const bulkQuotesInput = document.getElementById('bulkQuotesInput');
@@ -1231,7 +1462,6 @@
       }
     });
 
-    // 다중 이미지 로드 및 순환(로테이션) 풀 등록
     async function handleBatchImages(fileList) {
       const files = Array.from(fileList);
       showToast(`${files.length}개의 스틸컷 이미지를 로드하는 중...`);
@@ -1245,7 +1475,6 @@
       state.uploadedStillsPool = [...state.uploadedStillsPool, ...loadedUrls];
       updateStillsPoolBadge();
 
-      // 기존 카드가 있으면 스틸컷 순환 매칭 재적용
       if (state.cards.length > 0 && state.uploadedStillsPool.length > 0) {
         for (let i = 0; i < state.cards.length; i++) {
           const assignedUrl = state.uploadedStillsPool[i % state.uploadedStillsPool.length];
@@ -1255,7 +1484,7 @@
       }
 
       renderCardsList();
-      renderCurrentCard();
+      renderCurrentCanvas();
       saveStateToStorage();
       showToast(`스틸컷 ${files.length}장 추가 완료 (순환 로테이션 적용됨)`);
     }
@@ -1268,30 +1497,18 @@
       });
     }
 
-    // 스마트 문구 파서 (- 매체 기자 - 규칙 및 1-2-3 이미지 순환 배정)
-    document.getElementById('btnParseReviews').addEventListener('click', async () => {
-      const raw = bulkQuotesInput.value.trim();
-      if (!raw) {
-        showToast("붙여넣은 리뷰 문구가 없습니다.");
-        return;
-      }
-
+    // 텍스트 파서 공통 함수
+    function parseRawReviewText(raw) {
       const parsed = [];
-      // 1순위: '문장... \n - 매체 기자 -' 패턴 파싱
       const dashPattern = /([\s\S]*?)(?:-\s*([^-\r\n]+?)\s*-)/g;
       let match;
-      let lastIdx = 0;
 
       while ((match = dashPattern.exec(raw)) !== null) {
         const quote = match[1].trim();
         const byline = match[2].trim();
-        lastIdx = dashPattern.lastIndex;
-        if (quote) {
-          parsed.push({ quote, byline });
-        }
+        if (quote) parsed.push({ quote, byline });
       }
 
-      // 대시(-) 패턴이 매칭되지 않은 경우: 빈 줄(더블 개행) 또는 1줄/1줄 단위 백업 파싱
       if (parsed.length === 0) {
         let blocks = raw.split(/\n\s*\n/).map(b => b.trim()).filter(Boolean);
         if (blocks.length > 1) {
@@ -1312,21 +1529,23 @@
           }
         }
       }
+      return parsed;
+    }
 
-      if (parsed.length === 0) {
-        showToast("유효한 문구를 추출하지 못했습니다.");
-        return;
-      }
+    // 새 목록 생성
+    document.getElementById('btnParseReviews').addEventListener('click', async () => {
+      const raw = bulkQuotesInput.value.trim();
+      if (!raw) return showToast("붙여넣은 리뷰 문구가 없습니다.");
 
-      showToast(`${parsed.length}개의 카드를 생성 및 스틸컷 순환 매칭 중...`);
+      const parsed = parseRawReviewText(raw);
+      if (parsed.length === 0) return showToast("유효한 문구를 추출하지 못했습니다.");
 
+      showToast(`${parsed.length}개의 새 카드를 생성 중...`);
       state.cards = [];
       for (let i = 0; i < parsed.length; i++) {
-        const item = parsed[i];
         let assignedImgSrc = null;
         let assignedImgObj = null;
 
-        // 1-2-3-1-2-3 순환 로테이션
         if (state.uploadedStillsPool.length > 0) {
           assignedImgSrc = state.uploadedStillsPool[i % state.uploadedStillsPool.length];
           assignedImgObj = await loadImage(assignedImgSrc);
@@ -1336,138 +1555,231 @@
           id: 'card_' + Date.now() + '_' + i,
           imageSrc: assignedImgSrc,
           imgObj: assignedImgObj,
-          quote: item.quote,
-          byline: item.byline,
+          quote: parsed[i].quote,
+          byline: parsed[i].byline,
           rating: 5
         });
       }
 
+      state.viewMode = 'card';
       state.currentIndex = 0;
       renderCardsList();
-      renderCurrentCard();
+      renderCurrentCanvas();
       saveStateToStorage();
-      showToast(`총 ${parsed.length}개의 리뷰 카드가 생성되었습니다! (이미지 1-2-3 순환 완료)`);
+      showToast(`총 ${parsed.length}개의 리뷰 카드가 새로 생성되었습니다!`);
     });
 
+    // 기존 목록 뒤에 추가(덧붙이기)
+    document.getElementById('btnAppendReviews').addEventListener('click', async () => {
+      const raw = bulkQuotesInput.value.trim();
+      if (!raw) return showToast("붙여넣은 리뷰 문구가 없습니다.");
+
+      const parsed = parseRawReviewText(raw);
+      if (parsed.length === 0) return showToast("유효한 문구를 추출하지 못했습니다.");
+
+      showToast(`${parsed.length}개의 리뷰를 기존 카드 뒤에 추가하는 중...`);
+      const startIdx = state.cards.length;
+
+      for (let i = 0; i < parsed.length; i++) {
+        const totalIdx = startIdx + i;
+        let assignedImgSrc = null;
+        let assignedImgObj = null;
+
+        if (state.uploadedStillsPool.length > 0) {
+          assignedImgSrc = state.uploadedStillsPool[totalIdx % state.uploadedStillsPool.length];
+          assignedImgObj = await loadImage(assignedImgSrc);
+        }
+
+        state.cards.push({
+          id: 'card_' + Date.now() + '_' + totalIdx,
+          imageSrc: assignedImgSrc,
+          imgObj: assignedImgObj,
+          quote: parsed[i].quote,
+          byline: parsed[i].byline,
+          rating: 5
+        });
+      }
+
+      renderCardsList();
+      renderCurrentCanvas();
+      saveStateToStorage();
+      showToast(`기존 목록 뒤에 ${parsed.length}개의 카드가 추가되었습니다!`);
+    });
+
+    // 포스터 모드 관련 이벤트
+    document.getElementById('posterMainImageInput').addEventListener('change', async (e) => {
+      if (e.target.files && e.target.files[0]) {
+        const file = e.target.files[0];
+        const dataUrl = await readFileAsDataURL(file);
+        state.posterConfig.mainImageSrc = dataUrl;
+        state.posterConfig.mainImgObj = await loadImage(dataUrl);
+        document.getElementById('posterMainImageName').innerText = file.name;
+        if (state.viewMode === 'poster') renderCurrentCanvas();
+        saveStateToStorage();
+        showToast("리뷰 포스터 대표 배경이 등록되었습니다.");
+      }
+    });
+
+    document.getElementById('posterLayoutCols').addEventListener('change', (e) => {
+      state.posterConfig.columns = parseInt(e.target.value);
+      if (state.viewMode === 'poster') renderCurrentCanvas();
+      saveStateToStorage();
+    });
+
+    document.getElementById('posterFontSizeSlider').addEventListener('input', (e) => {
+      state.posterConfig.fontSize = parseInt(e.target.value);
+      document.getElementById('posterFontSizeVal').innerText = e.target.value + 'px';
+      if (state.viewMode === 'poster') renderCurrentCanvas();
+      saveStateToStorage();
+    });
+
+    document.getElementById('btnSwitchToPosterMode').addEventListener('click', () => {
+      state.viewMode = 'poster';
+      renderCurrentCanvas();
+      showToast("종합 리뷰 포스터 뷰로 전환되었습니다.");
+    });
+
+    // 탭 전환
     const tabBtnBatch = document.getElementById('tabBtnBatch');
     const tabBtnCards = document.getElementById('tabBtnCards');
+    const tabBtnReviewPoster = document.getElementById('tabBtnReviewPoster');
     const tabBtnStyle = document.getElementById('tabBtnStyle');
+
     const tabContentBatch = document.getElementById('tabContentBatch');
     const tabContentCards = document.getElementById('tabContentCards');
+    const tabContentReviewPoster = document.getElementById('tabContentReviewPoster');
     const tabContentStyle = document.getElementById('tabContentStyle');
 
     function setActiveTab(btn, content) {
-      [tabBtnBatch, tabBtnCards, tabBtnStyle].forEach(b => {
+      [tabBtnBatch, tabBtnCards, tabBtnReviewPoster, tabBtnStyle].forEach(b => {
         b.className = 'flex-1 py-2.5 text-xs font-semibold border-b-2 border-transparent text-gray-400 hover:text-gray-200 flex items-center justify-center gap-1.5 transition';
       });
-      [tabContentBatch, tabContentCards, tabContentStyle].forEach(c => c.classList.add('hidden'));
+      [tabContentBatch, tabContentCards, tabContentReviewPoster, tabContentStyle].forEach(c => c.classList.add('hidden'));
 
       btn.className = 'flex-1 py-2.5 text-xs font-bold border-b-2 border-gold-400 text-gold-400 flex items-center justify-center gap-1.5 transition';
       content.classList.remove('hidden');
     }
 
-    tabBtnBatch.onclick = () => setActiveTab(tabBtnBatch, tabContentBatch);
-    tabBtnCards.onclick = () => setActiveTab(tabBtnCards, tabContentCards);
-    tabBtnStyle.onclick = () => setActiveTab(tabBtnStyle, tabContentStyle);
+    tabBtnBatch.onclick = () => {
+      setActiveTab(tabBtnBatch, tabContentBatch);
+      if (state.viewMode === 'poster') { state.viewMode = 'card'; renderCurrentCanvas(); }
+    };
+    tabBtnCards.onclick = () => {
+      setActiveTab(tabBtnCards, tabContentCards);
+      if (state.viewMode === 'poster') { state.viewMode = 'card'; renderCurrentCanvas(); }
+    };
+    tabBtnReviewPoster.onclick = () => {
+      setActiveTab(tabBtnReviewPoster, tabContentReviewPoster);
+      state.viewMode = 'poster';
+      renderCurrentCanvas();
+    };
+    tabBtnStyle.onclick = () => {
+      setActiveTab(tabBtnStyle, tabContentStyle);
+      if (state.viewMode === 'poster') { state.viewMode = 'card'; renderCurrentCanvas(); }
+    };
 
     topMovieTitle.addEventListener('input', (e) => {
       state.projectTitle = e.target.value;
-      renderCurrentCard();
+      renderCurrentCanvas();
       saveStateToStorage();
     });
     document.getElementById('inputFestivalBadge').addEventListener('input', (e) => {
       state.common.festivalBadge = e.target.value;
-      renderCurrentCard();
+      renderCurrentCanvas();
       saveStateToStorage();
     });
     document.getElementById('inputMovieCredits').addEventListener('input', (e) => {
       state.common.credits = e.target.value;
-      renderCurrentCard();
+      renderCurrentCanvas();
       saveStateToStorage();
     });
 
+    // 캔버스 규격 변경 (가로/세로/SNS)
     document.querySelectorAll('.ratio-btn').forEach(btn => {
       btn.onclick = () => {
         state.ratio = btn.dataset.ratio;
+        state.viewMode = 'card';
         applyStyleValuesToInputs();
-        renderCurrentCard();
+        renderCurrentCanvas();
         saveStateToStorage();
       };
     });
 
     document.getElementById('fontFamilySelect').onchange = (e) => {
       state.style.fontFamily = e.target.value;
-      renderCurrentCard();
+      renderCurrentCanvas();
       saveStateToStorage();
     };
     document.getElementById('valignSelect').onchange = (e) => {
       state.style.valign = e.target.value;
-      renderCurrentCard();
+      renderCurrentCanvas();
       saveStateToStorage();
     };
     
     document.getElementById('quoteSizeSlider').oninput = (e) => {
       state.style.quoteSize = e.target.value;
       document.getElementById('quoteSizeVal').innerText = e.target.value + 'px';
-      renderCurrentCard();
+      renderCurrentCanvas();
       saveStateToStorage();
     };
 
     document.getElementById('maskOpacitySlider').oninput = (e) => {
       state.style.maskOpacity = e.target.value / 100;
       document.getElementById('maskOpacityValue').innerText = e.target.value + '%';
-      renderCurrentCard();
+      renderCurrentCanvas();
       saveStateToStorage();
     };
     
     document.getElementById('checkVignette').onchange = (e) => {
       state.style.vignette = e.target.checked;
-      renderCurrentCard();
+      renderCurrentCanvas();
       saveStateToStorage();
     };
     document.getElementById('checkDualFade').onchange = (e) => {
       state.style.dualFade = e.target.checked;
-      renderCurrentCard();
+      renderCurrentCanvas();
       saveStateToStorage();
     };
     document.getElementById('checkBoxBackdrop').onchange = (e) => {
       state.style.boxBackdrop = e.target.checked;
-      renderCurrentCard();
+      renderCurrentCanvas();
       saveStateToStorage();
     };
     document.getElementById('checkTextGlow').onchange = (e) => {
       state.style.textGlow = e.target.checked;
-      renderCurrentCard();
+      renderCurrentCanvas();
       saveStateToStorage();
     };
     document.getElementById('checkSpotlight').onchange = (e) => {
       state.style.spotlight = e.target.checked;
-      renderCurrentCard();
+      renderCurrentCanvas();
       saveStateToStorage();
     };
 
     document.getElementById('accentColorPicker').oninput = (e) => {
       state.style.accentColor = e.target.value;
-      renderCurrentCard();
+      renderCurrentCanvas();
       saveStateToStorage();
     };
     document.getElementById('decoSelect').onchange = (e) => {
       state.style.decoration = e.target.value;
-      renderCurrentCard();
+      renderCurrentCanvas();
       saveStateToStorage();
     };
 
     document.getElementById('btnPrevCard').onclick = () => {
       if (state.cards.length === 0) return;
+      state.viewMode = 'card';
       state.currentIndex = (state.currentIndex - 1 + state.cards.length) % state.cards.length;
       renderCardsList();
-      renderCurrentCard();
+      renderCurrentCanvas();
     };
     document.getElementById('btnNextCard').onclick = () => {
       if (state.cards.length === 0) return;
+      state.viewMode = 'card';
       state.currentIndex = (state.currentIndex + 1) % state.cards.length;
       renderCardsList();
-      renderCurrentCard();
+      renderCurrentCanvas();
     };
 
     document.getElementById('btnForceSave').onclick = () => {
@@ -1475,16 +1787,113 @@
       showToast("브라우저 로컬 저장소에 저장되었습니다.");
     };
 
+    // 백업 내보내기 (JSON 파일 다운로드)
+    document.getElementById('btnExportJson').onclick = () => {
+      const serializableCards = state.cards.map(c => ({
+        id: c.id,
+        imageSrc: c.imageSrc,
+        quote: c.quote,
+        byline: c.byline,
+        rating: c.rating || 5
+      }));
+
+      const exportData = {
+        projectTitle: state.projectTitle,
+        ratio: state.ratio,
+        common: state.common,
+        style: state.style,
+        posterConfig: {
+          mainImageSrc: state.posterConfig.mainImageSrc,
+          columns: state.posterConfig.columns,
+          fontSize: state.posterConfig.fontSize
+        },
+        cards: serializableCards,
+        uploadedStillsPool: state.uploadedStillsPool
+      };
+
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+      const safeTitle = (state.projectTitle || 'CineQuote_Project').replace(/[/\\?%*:|"<>]/g, '_');
+      saveAs(blob, `${safeTitle}_backup_${new Date().toISOString().slice(0,10)}.json`);
+      showToast("프로젝트 백업 파일(JSON)이 다운로드되었습니다.");
+    };
+
+    // 백업 불러오기 (JSON 파일 읽기)
+    document.getElementById('btnImportJson').onclick = () => {
+      document.getElementById('importJsonInput').click();
+    };
+
+    document.getElementById('importJsonInput').onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async (evt) => {
+        try {
+          const imported = JSON.parse(evt.target.result);
+          state.projectTitle = imported.projectTitle || "";
+          state.ratio = imported.ratio || 'landscape';
+          state.common = imported.common || { festivalBadge: "", credits: "" };
+          state.style = Object.assign(state.style, imported.style || {});
+          state.uploadedStillsPool = imported.uploadedStillsPool || [];
+
+          if (imported.posterConfig) {
+            state.posterConfig.mainImageSrc = imported.posterConfig.mainImageSrc || null;
+            state.posterConfig.columns = imported.posterConfig.columns || 2;
+            state.posterConfig.fontSize = imported.posterConfig.fontSize || 20;
+            if (state.posterConfig.mainImageSrc) {
+              state.posterConfig.mainImgObj = await loadImage(state.posterConfig.mainImageSrc);
+            }
+          }
+
+          topMovieTitle.value = state.projectTitle;
+          document.getElementById('inputFestivalBadge').value = state.common.festivalBadge;
+          document.getElementById('inputMovieCredits').value = state.common.credits;
+
+          state.cards = [];
+          if (Array.isArray(imported.cards)) {
+            for (let i = 0; i < imported.cards.length; i++) {
+              const item = imported.cards[i];
+              const imgObj = await loadImage(item.imageSrc);
+              state.cards.push({
+                id: item.id || 'card_' + Date.now() + '_' + i,
+                imageSrc: item.imageSrc,
+                imgObj: imgObj,
+                quote: item.quote,
+                byline: item.byline,
+                rating: item.rating || 5
+              });
+            }
+          }
+
+          state.viewMode = 'card';
+          state.currentIndex = 0;
+          updateStillsPoolBadge();
+          applyStyleValuesToInputs();
+          renderCardsList();
+          renderCurrentCanvas();
+          saveStateToStorage();
+          showToast("백업 데이터를 성공적으로 불러왔습니다!");
+        } catch (err) {
+          console.error(err);
+          showToast("올바른 백업 JSON 파일이 아닙니다.");
+        }
+      };
+      reader.readAsText(file);
+    };
+
     document.getElementById('btnResetAll').onclick = async () => {
       state.projectTitle = "";
       state.common = { festivalBadge: "", credits: "" };
       state.cards = [];
       state.uploadedStillsPool = [];
+      state.posterConfig.mainImageSrc = null;
+      state.posterConfig.mainImgObj = null;
       state.currentIndex = 0;
       topMovieTitle.value = "";
       document.getElementById('inputFestivalBadge').value = "";
       document.getElementById('inputMovieCredits').value = "";
       bulkQuotesInput.value = "";
+      document.getElementById('posterMainImageName').innerText = "등록 안 됨 (1번 스틸 자동 사용)";
       updateStillsPoolBadge();
       
       const db = await openDatabase();
@@ -1492,22 +1901,22 @@
       tx.objectStore(STORE_NAME).clear();
 
       renderCardsList();
-      renderCurrentCard();
-      showToast("모든 내용과 스틸컷 풀이 초기화되었습니다.");
+      renderCurrentCanvas();
+      showToast("모든 내용이 초기화되었습니다.");
     };
 
     document.getElementById('btnDownloadSingle').onclick = () => {
-      if (state.cards.length === 0) {
-        showToast("다운로드할 카드가 없습니다.");
-        return;
-      }
-      renderCurrentCard();
+      renderCurrentCanvas();
       const safeTitle = (state.projectTitle || 'Review_Card').replace(/[/\\?%*:|"<>]/g, '_');
       const link = document.createElement('a');
-      link.download = `${safeTitle}_Card_${state.currentIndex + 1}.png`;
+      if (state.viewMode === 'poster') {
+        link.download = `${safeTitle}_Combined_Poster.png`;
+      } else {
+        link.download = `${safeTitle}_Card_${state.currentIndex + 1}.png`;
+      }
       link.href = canvas.toDataURL('image/png', 0.95);
       link.click();
-      showToast(`카드 #${state.currentIndex + 1} PNG 다운로드 완료`);
+      showToast("PNG 다운로드 완료");
     };
 
     document.getElementById('btnDownloadAllZip').onclick = async () => {
@@ -1515,27 +1924,38 @@
         showToast("다운로드할 카드가 없습니다.");
         return;
       }
-      showToast("전체 고해상도 ZIP 압축을 시작합니다...");
+      showToast("개별 카드 및 종합 포스터 ZIP 압축 중...");
 
       const zip = new JSZip();
       const safeTitle = (state.projectTitle || 'Review_Cards').replace(/[/\\?%*:|"<>]/g, '_');
       const folder = zip.folder(`${safeTitle}_Collection`);
       const origIndex = state.currentIndex;
+      const origMode = state.viewMode;
 
+      // 1. 개별 카드들 압축
+      state.viewMode = 'card';
       for (let i = 0; i < state.cards.length; i++) {
         state.currentIndex = i;
-        renderCurrentCard();
+        renderCurrentCanvas();
         const dataUrl = canvas.toDataURL('image/jpeg', 0.92);
         const base64Data = dataUrl.replace(/^data:image\/(png|jpeg);base64,/, "");
         folder.file(`${safeTitle}_Card_${String(i + 1).padStart(2, '0')}.jpg`, base64Data, { base64: true });
       }
 
+      // 2. 종합 리뷰 포스터도 ZIP에 자동 포함
+      state.viewMode = 'poster';
+      renderCurrentCanvas();
+      const posterDataUrl = canvas.toDataURL('image/jpeg', 0.94);
+      const posterBase64 = posterDataUrl.replace(/^data:image\/(png|jpeg);base64,/, "");
+      folder.file(`${safeTitle}_Combined_Poster.jpg`, posterBase64, { base64: true });
+
+      state.viewMode = origMode;
       state.currentIndex = origIndex;
-      renderCurrentCard();
+      renderCurrentCanvas();
 
       const content = await zip.generateAsync({ type: 'blob' });
       saveAs(content, `${safeTitle}_Collection.zip`);
-      showToast(`총 ${state.cards.length}장의 카드가 ZIP으로 다운로드되었습니다!`);
+      showToast(`총 ${state.cards.length}장의 카드와 종합 포스터가 ZIP으로 다운로드되었습니다!`);
     };
 
     document.getElementById('previewScale').onchange = (e) => {
