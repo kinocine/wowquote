@@ -67,7 +67,7 @@
       <div>
         <div class="flex items-center gap-2">
           <span class="text-base font-extrabold text-white tracking-tight">CineQuote</span>
-          <span class="text-[10px] px-1.5 py-0.5 rounded bg-gold-500/20 text-gold-400 font-bold border border-gold-500/30">PRO v2.0</span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-gold-500/20 text-gold-400 font-bold border border-gold-500/30">PRO v2.1</span>
           <span id="saveStatusBadge" class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
             <i data-lucide="check" class="w-3 h-3"></i> 준비 완료
           </span>
@@ -75,7 +75,7 @@
       </div>
     </div>
 
-    <!-- Top Center Project Movie Title Input -->
+    <!-- Top Project Title Input -->
     <div class="flex-1 max-w-md min-w-[240px] flex items-center gap-2 bg-cinema-850 px-3 py-1.5 rounded-lg border border-cinema-700/90 focus-within:border-gold-400">
       <i data-lucide="film" class="w-4 h-4 text-gold-400 flex-shrink-0"></i>
       <div class="flex-1">
@@ -113,21 +113,75 @@
     <!-- LEFT PANEL -->
     <aside class="w-full lg:w-[480px] xl:w-[520px] border-r border-cinema-700/80 bg-cinema-900 flex flex-col h-[52vh] lg:h-[calc(100vh-63px)]">
       
-      <!-- Tab Navigation -->
+      <!-- Reordered Tabs: 1. 일괄 추가 -> 2. 카드 관리 -> 3. 스타일 -->
       <div class="flex border-b border-cinema-700 bg-cinema-950/80 sticky top-0 z-20">
-        <button id="tabBtnCards" class="flex-1 py-2.5 text-xs font-bold border-b-2 border-gold-400 text-gold-400 flex items-center justify-center gap-1.5 transition">
-          <i data-lucide="list-ordered" class="w-3.5 h-3.5"></i> 1. 카드 관리 & 순서
+        <button id="tabBtnBatch" class="flex-1 py-2.5 text-xs font-bold border-b-2 border-gold-400 text-gold-400 flex items-center justify-center gap-1.5 transition">
+          <i data-lucide="file-text" class="w-3.5 h-3.5"></i> 1. 문구·스틸 일괄 추가
         </button>
-        <button id="tabBtnBatch" class="flex-1 py-2.5 text-xs font-semibold border-b-2 border-transparent text-gray-400 hover:text-gray-200 flex items-center justify-center gap-1.5 transition">
-          <i data-lucide="file-text" class="w-3.5 h-3.5"></i> 2. 문구·스틸 일괄 추가
+        <button id="tabBtnCards" class="flex-1 py-2.5 text-xs font-semibold border-b-2 border-transparent text-gray-400 hover:text-gray-200 flex items-center justify-center gap-1.5 transition">
+          <i data-lucide="list-ordered" class="w-3.5 h-3.5"></i> 2. 카드 관리 & 순서
         </button>
         <button id="tabBtnStyle" class="flex-1 py-2.5 text-xs font-semibold border-b-2 border-transparent text-gray-400 hover:text-gray-200 flex items-center justify-center gap-1.5 transition">
           <i data-lucide="palette" class="w-3.5 h-3.5"></i> 3. 디자인 스타일
         </button>
       </div>
 
-      <!-- TAB 1: Real-time Card Manager -->
-      <div id="tabContentCards" class="flex-1 overflow-y-auto p-4 space-y-4">
+      <!-- TAB 1: Batch Importer (Default Tab) -->
+      <div id="tabContentBatch" class="flex-1 overflow-y-auto p-4 space-y-4">
+        <div class="bg-cinema-850 p-3 rounded-xl border border-cinema-700/70 space-y-2.5">
+          <h3 class="text-xs font-bold text-gray-200 flex items-center gap-1.5">
+            <i data-lucide="layout-template" class="w-3.5 h-3.5 text-gold-400"></i> 포스터 공통 문구 설정
+          </h3>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <span class="text-[10px] text-gray-400 block mb-0.5">상단 영화제/헤드라인</span>
+              <input type="text" id="inputFestivalBadge" placeholder="예: 제51회 토론토국제영화제 초청작" class="w-full bg-cinema-900 border border-cinema-700 rounded-md px-2 py-1 text-xs text-white focus:border-gold-400 focus:outline-none">
+            </div>
+            <div>
+              <span class="text-[10px] text-gray-400 block mb-0.5">하단 개봉 일정 및 크레딧</span>
+              <input type="text" id="inputMovieCredits" placeholder="예: 극장 대개봉 | 감독 및 주연배우" class="w-full bg-cinema-900 border border-cinema-700 rounded-md px-2 py-1 text-xs text-white focus:border-gold-400 focus:outline-none">
+            </div>
+          </div>
+        </div>
+
+        <!-- Multi Stills Dropzone -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-gray-300 flex items-center gap-1.5">
+              <i data-lucide="images" class="w-3.5 h-3.5 text-gold-400"></i> 영화 스틸컷 추가 업로드 (N장)
+            </span>
+          </div>
+          <div id="dropZone" class="border-2 border-dashed border-cinema-700 hover:border-gold-400 bg-cinema-850/60 hover:bg-cinema-850 rounded-xl p-4 text-center cursor-pointer transition flex flex-col items-center justify-center gap-1.5">
+            <input type="file" id="imageInput" multiple accept="image/*" class="hidden">
+            <i data-lucide="upload-cloud" class="w-6 h-6 text-gold-400"></i>
+            <p class="text-xs font-medium text-gray-200">새 스틸컷들을 드래그하거나 클릭하여 추가</p>
+            <p class="text-[10px] text-gray-500">순서대로 카드에 이미지가 지정됩니다.</p>
+          </div>
+        </div>
+
+        <!-- Textarea for Batch Review Texts -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-gray-300 flex items-center gap-1.5">
+              <i data-lucide="file-input" class="w-3.5 h-3.5 text-gold-400"></i> 리뷰 문구 일괄 붙여넣기
+            </span>
+            <button id="btnParseReviews" class="px-2.5 py-1 text-xs font-bold text-black bg-gold-400 hover:bg-gold-300 rounded flex items-center gap-1 transition">
+              <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> 문구 목록으로 카드 생성
+            </button>
+          </div>
+          <p class="text-[11px] text-gray-400">
+            줄바꿈으로 구분해 붙여넣으세요. (1줄 카피 / 1줄 기자명 순서 또는 카피만 나열해도 자동 매핑됩니다)
+          </p>
+          <textarea id="bulkQuotesInput" rows="9" class="w-full bg-cinema-850 border border-cinema-700 rounded-xl p-3 text-xs font-sans text-gray-200 focus:border-gold-400 focus:outline-none leading-relaxed placeholder-gray-600 resize-y" placeholder="첫 번째 리뷰 카피
+매체명 기자명
+
+두 번째 리뷰 카피
+매체명 기자명"></textarea>
+        </div>
+      </div>
+
+      <!-- TAB 2: Card Manager -->
+      <div id="tabContentCards" class="flex-1 overflow-y-auto p-4 space-y-4 hidden">
         <div class="space-y-2">
           <div class="flex items-center gap-2">
             <div class="relative flex-1">
@@ -149,70 +203,22 @@
         </div>
       </div>
 
-      <!-- TAB 2: Batch Importer -->
-      <div id="tabContentBatch" class="flex-1 overflow-y-auto p-4 space-y-4 hidden">
-        <div class="bg-cinema-850 p-3 rounded-xl border border-cinema-700/70 space-y-2.5">
-          <h3 class="text-xs font-bold text-gray-200 flex items-center gap-1.5">
-            <i data-lucide="layout-template" class="w-3.5 h-3.5 text-gold-400"></i> 포스터 공통 문구 설정
-          </h3>
-          <div class="grid grid-cols-2 gap-2">
-            <div>
-              <span class="text-[10px] text-gray-400 block mb-0.5">상단 영화제/헤드라인</span>
-              <input type="text" id="inputFestivalBadge" placeholder="예: 제51회 토론토국제영화제 초청작" class="w-full bg-cinema-900 border border-cinema-700 rounded-md px-2 py-1 text-xs text-white focus:border-gold-400 focus:outline-none">
-            </div>
-            <div>
-              <span class="text-[10px] text-gray-400 block mb-0.5">하단 개봉 일정 및 크레딧</span>
-              <input type="text" id="inputMovieCredits" placeholder="예: 9월 극장 대개봉 | 감독 및 주연배우" class="w-full bg-cinema-900 border border-cinema-700 rounded-md px-2 py-1 text-xs text-white focus:border-gold-400 focus:outline-none">
-            </div>
-          </div>
-        </div>
-
-        <!-- Multi Stills Dropzone -->
-        <div class="space-y-2">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-gray-300 flex items-center gap-1.5">
-              <i data-lucide="images" class="w-3.5 h-3.5 text-gold-400"></i> 영화 스틸컷 추가 업로드 (N장)
-            </span>
-          </div>
-          <div id="dropZone" class="border-2 border-dashed border-cinema-700 hover:border-gold-400 bg-cinema-850/60 hover:bg-cinema-850 rounded-xl p-4 text-center cursor-pointer transition flex flex-col items-center justify-center gap-1.5">
-            <input type="file" id="imageInput" multiple accept="image/*" class="hidden">
-            <i data-lucide="upload-cloud" class="w-6 h-6 text-gold-400"></i>
-            <p class="text-xs font-medium text-gray-200">새 스틸컷들을 드래그하거나 클릭하여 추가</p>
-            <p class="text-[10px] text-gray-500">기존 카드 뒤에 추가되거나 이미지가 교체됩니다.</p>
-          </div>
-        </div>
-
-        <!-- Textarea for Batch Review Texts -->
-        <div class="space-y-2">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-gray-300 flex items-center gap-1.5">
-              <i data-lucide="file-input" class="w-3.5 h-3.5 text-gold-400"></i> 리뷰 문구 일괄 붙여넣기
-            </span>
-            <button id="btnParseReviews" class="px-2.5 py-1 text-xs font-bold text-black bg-gold-400 hover:bg-gold-300 rounded flex items-center gap-1 transition">
-              <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> 문구 목록으로 카드 생성
-            </button>
-          </div>
-          <p class="text-[11px] text-gray-400">
-            기자 리뷰 문구 목록을 붙여넣으세요. (첫 줄: 헤드카피, 둘째 줄: 매체 및 기자명)
-          </p>
-          <textarea id="bulkQuotesInput" rows="8" class="w-full bg-cinema-850 border border-cinema-700 rounded-xl p-3 text-xs font-sans text-gray-200 focus:border-gold-400 focus:outline-none leading-relaxed placeholder-gray-600 resize-y" placeholder="리뷰 카피 첫 줄
-매체명 기자명
-
-두 번째 리뷰 카피
-매체명 기자명"></textarea>
-        </div>
-      </div>
-
       <!-- TAB 3: Style Options -->
       <div id="tabContentStyle" class="flex-1 overflow-y-auto p-4 space-y-4 hidden">
+        <!-- Ratio Selector: 가로 -> 세로 -> SNS 순서 -->
         <div class="bg-cinema-850 p-3 rounded-xl border border-cinema-700 space-y-2">
           <span class="text-xs font-bold text-gray-200 flex items-center justify-between">
             <span>규격 / 캔버스 종횡비</span>
-            <span id="resolutionBadge" class="text-[11px] font-mono text-gold-400">1000 × 1500 px</span>
+            <span id="resolutionBadge" class="text-[11px] font-mono text-gold-400">1280 × 720 px</span>
           </span>
           <div class="grid grid-cols-3 gap-2 text-xs">
-            <button data-ratio="poster" class="ratio-btn active border border-gold-400 bg-gold-400/15 text-white font-semibold py-2 px-1 rounded-lg flex flex-col items-center gap-1">
-              <span class="w-3.5 h-5 border-2 border-gold-400 rounded-sm"></span>
+            <button data-ratio="landscape" class="ratio-btn active border border-gold-400 bg-gold-400/15 text-white font-semibold py-2 px-1 rounded-lg flex flex-col items-center gap-1">
+              <span class="w-5 h-3 border-2 border-gold-400 rounded-sm"></span>
+              <span>가로 스틸형</span>
+              <span class="text-[9px] text-gray-400">16:9 (1280×720)</span>
+            </button>
+            <button data-ratio="poster" class="ratio-btn border border-cinema-700 bg-cinema-900 text-gray-300 hover:text-white font-medium py-2 px-1 rounded-lg flex flex-col items-center gap-1">
+              <span class="w-3.5 h-5 border-2 border-gray-400 rounded-sm"></span>
               <span>세로 포스터</span>
               <span class="text-[9px] text-gray-400">2:3 (1000×1500)</span>
             </button>
@@ -220,11 +226,6 @@
               <span class="w-4 h-4 border-2 border-gray-400 rounded-sm"></span>
               <span>SNS 정방형</span>
               <span class="text-[9px] text-gray-400">1:1 (1080×1080)</span>
-            </button>
-            <button data-ratio="landscape" class="ratio-btn border border-cinema-700 bg-cinema-900 text-gray-300 hover:text-white font-medium py-2 px-1 rounded-lg flex flex-col items-center gap-1">
-              <span class="w-5 h-3 border-2 border-gray-400 rounded-sm"></span>
-              <span>가로 스틸형</span>
-              <span class="text-[9px] text-gray-400">16:9 (1280×720)</span>
             </button>
           </div>
         </div>
@@ -254,7 +255,7 @@
               <span class="text-gray-400">리뷰 헤드라인 글자 크기</span>
               <span id="quoteSizeVal" class="text-gold-400 font-mono">46px</span>
             </div>
-            <input type="range" id="quoteSizeSlider" min="26" max="72" value="46" class="w-full accent-gold-400 cursor-pointer">
+            <input type="range" id="quoteSizeSlider" min="24" max="72" value="46" class="w-full accent-gold-400 cursor-pointer">
           </div>
 
           <div class="grid grid-cols-2 gap-2 pt-1">
@@ -268,9 +269,9 @@
             <div>
               <span class="text-[10px] text-gray-400 block mb-1">상단 장식 배지</span>
               <select id="decoSelect" class="w-full bg-cinema-900 border border-cinema-700 rounded p-1.5 text-xs text-white">
+                <option value="none" selected>장식 없음 (기본)</option>
                 <option value="stars">★★★★★ 별점 5개</option>
                 <option value="quotes">“ 큰따옴표</option>
-                <option value="none">장식 없음</option>
               </select>
             </div>
           </div>
@@ -361,11 +362,11 @@
   <script>
     const state = {
       projectTitle: "",
-      ratio: 'poster',
+      ratio: 'landscape', // 기본을 가로형으로 설정
       dimensions: {
+        landscape: { width: 1280, height: 720, label: '1280 × 720 px' },
         poster: { width: 1000, height: 1500, label: '1000 × 1500 px' },
-        square: { width: 1080, height: 1080, label: '1080 × 1080 px' },
-        landscape: { width: 1280, height: 720, label: '1280 × 720 px' }
+        square: { width: 1080, height: 1080, label: '1080 × 1080 px' }
       },
       common: {
         festivalBadge: "",
@@ -380,7 +381,7 @@
         dualFade: true,
         quoteSize: 46,
         accentColor: '#fbbf24',
-        decoration: 'stars'
+        decoration: 'none' // 별점 기본 노출 끔
       },
       currentIndex: 0,
       searchQuery: '',
@@ -389,7 +390,7 @@
     };
 
     const DB_NAME = 'CineQuoteStudioDB_Clean';
-    const DB_VERSION = 1;
+    const DB_VERSION = 2;
     const STORE_NAME = 'projects';
 
     function openDatabase() {
@@ -495,7 +496,7 @@
       const saved = await loadStateFromStorage();
       if (saved && saved.cards && saved.cards.length > 0) {
         state.projectTitle = saved.projectTitle || "";
-        state.ratio = saved.ratio || 'poster';
+        state.ratio = saved.ratio || 'landscape';
         state.common = saved.common || { festivalBadge: "", credits: "" };
         state.style = saved.style || state.style;
         state.currentIndex = saved.currentIndex || 0;
@@ -519,7 +520,6 @@
         }
         showToast("이전 작업 내역을 복원했습니다.");
       } else {
-        // Start completely clean
         state.cards = [];
         state.currentIndex = 0;
       }
@@ -557,7 +557,6 @@
       canvas.width = dim.width;
       canvas.height = dim.height;
 
-      // When no cards exist, render a clean placeholder canvas
       if (!state.cards || state.cards.length === 0) {
         ctx.fillStyle = '#0f131a';
         ctx.fillRect(0, 0, dim.width, dim.height);
@@ -568,7 +567,7 @@
         ctx.fillText("등록된 카드가 없습니다", dim.width / 2, dim.height / 2 - 20);
         ctx.font = '400 18px "Noto Sans KR", sans-serif';
         ctx.fillStyle = '#334155';
-        ctx.fillText("좌측 패널에서 스틸컷을 추가하거나 새 카드를 만드세요", dim.width / 2, dim.height / 2 + 25);
+        ctx.fillText("좌측 1번 탭에서 문구와 스틸컷을 일괄 추가하세요", dim.width / 2, dim.height / 2 + 25);
         updateCarouselUI();
         return;
       }
@@ -577,7 +576,6 @@
       const card = state.cards[state.currentIndex];
       if (!card) return;
 
-      // 1. Draw Image or dark backdrop
       if (card.imgObj) {
         drawImageCover(ctx, card.imgObj, 0, 0, dim.width, dim.height);
       } else {
@@ -585,20 +583,14 @@
         ctx.fillRect(0, 0, dim.width, dim.height);
       }
 
-      // 2. Masks
       applyCinematicMasks(ctx, dim.width, dim.height);
 
-      // 3. Top Festival Badge
       if (state.common.festivalBadge && state.common.festivalBadge.trim() !== '') {
         renderTopFestivalBadge(ctx, state.common.festivalBadge, dim.width);
       }
 
-      // 4. Quote & Byline
       renderQuoteSection(ctx, card, dim.width, dim.height);
-
-      // 5. Bottom Film Title & Billing
       renderBottomBilling(ctx, dim.width, dim.height);
-
       updateCarouselUI();
     }
 
@@ -653,8 +645,8 @@
     function renderTopFestivalBadge(ctx, text, w) {
       ctx.save();
       ctx.textAlign = 'center';
-      const badgeY = 64;
-      ctx.font = '500 16px "Noto Sans KR", sans-serif';
+      const badgeY = 56;
+      ctx.font = '500 15px "Noto Sans KR", sans-serif';
       ctx.letterSpacing = '3px';
       ctx.fillStyle = '#e2e8f0';
       ctx.fillText(text.toUpperCase(), w / 2, badgeY);
@@ -688,6 +680,7 @@
         startY = state.ratio === 'landscape' ? h * 0.50 : h * 0.61;
       }
 
+      // 장식 옵션
       if (state.style.decoration === 'stars') {
         ctx.textAlign = 'center';
         ctx.font = '900 24px sans-serif';
@@ -726,9 +719,9 @@
       });
 
       if (card.byline) {
-        const bylineY = startY + (lines.length * lineHeight) + 24;
+        const bylineY = startY + (lines.length * lineHeight) + 20;
         ctx.shadowBlur = 8;
-        ctx.font = '500 20px "Noto Sans KR", sans-serif';
+        ctx.font = '500 18px "Noto Sans KR", sans-serif';
         ctx.fillStyle = '#cbd5e1';
         ctx.letterSpacing = '1px';
         ctx.fillText(card.byline, startX, bylineY);
@@ -764,21 +757,21 @@
       if (!title && !credits) return;
 
       ctx.save();
-      ctx.textAlign = 'center';
 
       if (state.ratio === 'landscape') {
-        ctx.font = '800 26px "Noto Sans KR", sans-serif';
+        ctx.font = '800 24px "Noto Sans KR", sans-serif';
         ctx.fillStyle = '#ffffff';
         ctx.shadowColor = 'black';
         ctx.shadowBlur = 10;
         ctx.textAlign = 'right';
-        if (title) ctx.fillText(title, w - 40, h - 38);
-        ctx.font = '400 13px "Noto Sans KR", sans-serif';
+        if (title) ctx.fillText(title, w - 40, h - 36);
+        ctx.font = '400 12px "Noto Sans KR", sans-serif';
         ctx.fillStyle = 'rgba(226, 232, 240, 0.85)';
-        if (credits) ctx.fillText(credits, w - 40, h - 18);
+        if (credits) ctx.fillText(credits, w - 40, h - 16);
       } else {
+        ctx.textAlign = 'center';
         const titleY = h - 85;
-        ctx.font = '900 46px "Noto Sans KR", sans-serif';
+        ctx.font = '900 44px "Noto Sans KR", sans-serif';
         ctx.fillStyle = '#ffffff';
         ctx.shadowColor = 'rgba(0,0,0,0.95)';
         ctx.shadowBlur = 20;
@@ -813,7 +806,7 @@
         cardsListContainer.innerHTML = `
           <div class="text-center py-8 text-gray-500 text-xs">
             <i data-lucide="layers" class="w-7 h-7 mx-auto mb-2 text-gray-600"></i>
-            등록된 리뷰 카드가 없습니다.<br>상단 [+ 새 카드 추가] 또는 [스틸컷 업로드]로 시작하세요.
+            등록된 카드가 없습니다.<br>1번 탭에서 문구와 이미지를 일괄 등록해 보세요.
           </div>
         `;
         lucide.createIcons();
@@ -1125,29 +1118,44 @@
       });
     }
 
+    // 개선된 스마트 문구 파서 (단순 줄바꿈 연속 입력 완벽 대응)
     document.getElementById('btnParseReviews').addEventListener('click', () => {
-      const raw = bulkQuotesInput.value;
-      if (!raw.trim()) {
+      const raw = bulkQuotesInput.value.trim();
+      if (!raw) {
         showToast("붙여넣은 리뷰 문구가 없습니다.");
         return;
       }
-      const blocks = raw.split(/\n\s*\n/).map(b => b.trim()).filter(Boolean);
+
+      // 빈 줄 기준으로 먼저 덩어리가 나뉘어 있는지 검사
+      let blocks = raw.split(/\n\s*\n/).map(b => b.trim()).filter(Boolean);
       const parsed = [];
 
-      blocks.forEach(block => {
-        const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
-        if (lines.length === 1) {
-          if (lines[0].includes(' - ')) {
-            const p = lines[0].split(' - ');
-            parsed.push({ quote: p[0].trim(), byline: p[1].trim() });
-          } else {
+      if (blocks.length > 1) {
+        // 빈 줄로 묶음이 명확히 구분된 경우
+        blocks.forEach(block => {
+          const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
+          if (lines.length === 1) {
             parsed.push({ quote: lines[0], byline: "" });
+          } else {
+            parsed.push({ quote: lines[0], byline: lines.slice(1).join(' ') });
           }
-        } else if (lines.length >= 2) {
-          parsed.push({ quote: lines[0], byline: lines[1] });
+        });
+      } else {
+        // 빈 줄 없이 연속으로 줄바꿈만 입력된 경우 (화면 입력 방식 대응)
+        const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
+        for (let i = 0; i < lines.length; i += 2) {
+          const quote = lines[i];
+          const byline = (i + 1 < lines.length) ? lines[i + 1] : "";
+          parsed.push({ quote, byline });
         }
-      });
+      }
 
+      if (parsed.length === 0) {
+        showToast("유효한 문구를 추출하지 못했습니다.");
+        return;
+      }
+
+      // 기존 카드가 있으면 내용 업데이트, 없으면 새 카드 생성
       parsed.forEach((item, idx) => {
         if (state.cards[idx]) {
           state.cards[idx].quote = item.quote;
@@ -1167,28 +1175,28 @@
       renderCardsList();
       renderCurrentCard();
       saveStateToStorage();
-      showToast(`${parsed.length}개의 리뷰 문구가 반영되었습니다.`);
+      showToast(`총 ${parsed.length}개의 리뷰 문구가 카드에 정상 매핑되었습니다!`);
     });
 
-    const tabBtnCards = document.getElementById('tabBtnCards');
     const tabBtnBatch = document.getElementById('tabBtnBatch');
+    const tabBtnCards = document.getElementById('tabBtnCards');
     const tabBtnStyle = document.getElementById('tabBtnStyle');
-    const tabContentCards = document.getElementById('tabContentCards');
     const tabContentBatch = document.getElementById('tabContentBatch');
+    const tabContentCards = document.getElementById('tabContentCards');
     const tabContentStyle = document.getElementById('tabContentStyle');
 
     function setActiveTab(btn, content) {
-      [tabBtnCards, tabBtnBatch, tabBtnStyle].forEach(b => {
+      [tabBtnBatch, tabBtnCards, tabBtnStyle].forEach(b => {
         b.className = 'flex-1 py-2.5 text-xs font-semibold border-b-2 border-transparent text-gray-400 hover:text-gray-200 flex items-center justify-center gap-1.5 transition';
       });
-      [tabContentCards, tabContentBatch, tabContentStyle].forEach(c => c.classList.add('hidden'));
+      [tabContentBatch, tabContentCards, tabContentStyle].forEach(c => c.classList.add('hidden'));
 
       btn.className = 'flex-1 py-2.5 text-xs font-bold border-b-2 border-gold-400 text-gold-400 flex items-center justify-center gap-1.5 transition';
       content.classList.remove('hidden');
     }
 
-    tabBtnCards.onclick = () => setActiveTab(tabBtnCards, tabContentCards);
     tabBtnBatch.onclick = () => setActiveTab(tabBtnBatch, tabContentBatch);
+    tabBtnCards.onclick = () => setActiveTab(tabBtnCards, tabContentCards);
     tabBtnStyle.onclick = () => setActiveTab(tabBtnStyle, tabContentStyle);
 
     topMovieTitle.addEventListener('input', (e) => {
