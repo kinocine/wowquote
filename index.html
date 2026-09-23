@@ -55,6 +55,20 @@
       background-size: 20px 20px;
       background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
     }
+    .draggable-card {
+      cursor: grab;
+      user-select: none;
+    }
+    .draggable-card:active {
+      cursor: grabbing;
+    }
+    .draggable-card.dragging {
+      opacity: 0.45;
+      border: 1px dashed #fbbf24;
+    }
+    .draggable-card.drag-over {
+      border-top: 2px solid #fbbf24;
+    }
   </style>
 </head>
 <body class="bg-cinema-950 text-gray-100 font-sans min-h-screen flex flex-col antialiased selection:bg-gold-500 selection:text-black">
@@ -67,7 +81,7 @@
       <div>
         <div class="flex items-center gap-2">
           <span class="text-base font-extrabold text-white tracking-tight">CineQuote</span>
-          <span class="text-[10px] px-1.5 py-0.5 rounded bg-gold-500/20 text-gold-400 font-bold border border-gold-500/30">PRO v2.1</span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded bg-gold-500/20 text-gold-400 font-bold border border-gold-500/30">PRO v2.2</span>
           <span id="saveStatusBadge" class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
             <i data-lucide="check" class="w-3 h-3"></i> 준비 완료
           </span>
@@ -113,7 +127,7 @@
     <!-- LEFT PANEL -->
     <aside class="w-full lg:w-[480px] xl:w-[520px] border-r border-cinema-700/80 bg-cinema-900 flex flex-col h-[52vh] lg:h-[calc(100vh-63px)]">
       
-      <!-- Reordered Tabs: 1. 일괄 추가 -> 2. 카드 관리 -> 3. 스타일 -->
+      <!-- Reordered Tabs -->
       <div class="flex border-b border-cinema-700 bg-cinema-950/80 sticky top-0 z-20">
         <button id="tabBtnBatch" class="flex-1 py-2.5 text-xs font-bold border-b-2 border-gold-400 text-gold-400 flex items-center justify-center gap-1.5 transition">
           <i data-lucide="file-text" class="w-3.5 h-3.5"></i> 1. 문구·스틸 일괄 추가
@@ -180,7 +194,7 @@
         </div>
       </div>
 
-      <!-- TAB 2: Card Manager -->
+      <!-- TAB 2: Card Manager with Drag & Drop Reordering -->
       <div id="tabContentCards" class="flex-1 overflow-y-auto p-4 space-y-4 hidden">
         <div class="space-y-2">
           <div class="flex items-center gap-2">
@@ -194,7 +208,9 @@
           </div>
           <div class="flex items-center justify-between text-[11px] text-gray-400 px-1">
             <span id="filteredCardCount">총 0개의 카드</span>
-            <span class="text-amber-400/90 font-medium">▲ ▼ 버튼으로 포스터 순서 변경 가능</span>
+            <span class="text-amber-400/90 font-medium flex items-center gap-1">
+              <i data-lucide="grip-vertical" class="w-3 h-3"></i> 마우스로 카드를 끌어서 순서 변경
+            </span>
           </div>
         </div>
 
@@ -203,9 +219,10 @@
         </div>
       </div>
 
-      <!-- TAB 3: Style Options -->
+      <!-- TAB 3: Style Options (30~100px Slider & Enhanced Mask Options) -->
       <div id="tabContentStyle" class="flex-1 overflow-y-auto p-4 space-y-4 hidden">
-        <!-- Ratio Selector: 가로 -> 세로 -> SNS 순서 -->
+        
+        <!-- Ratio Selector -->
         <div class="bg-cinema-850 p-3 rounded-xl border border-cinema-700 space-y-2">
           <span class="text-xs font-bold text-gray-200 flex items-center justify-between">
             <span>규격 / 캔버스 종횡비</span>
@@ -230,8 +247,9 @@
           </div>
         </div>
 
+        <!-- Typography & Layout -->
         <div class="bg-cinema-850 p-3 rounded-xl border border-cinema-700 space-y-3">
-          <h4 class="text-xs font-bold text-gray-200">폰트 및 배치</h4>
+          <h4 class="text-xs font-bold text-gray-200">폰트 및 크기/배치</h4>
           <div class="grid grid-cols-2 gap-2">
             <div>
               <span class="text-[10px] text-gray-400 block mb-1">서체 종류</span>
@@ -250,12 +268,13 @@
             </div>
           </div>
 
+          <!-- Extended 30 ~ 100px Slider -->
           <div class="space-y-1">
             <div class="flex justify-between text-[11px]">
-              <span class="text-gray-400">리뷰 헤드라인 글자 크기</span>
-              <span id="quoteSizeVal" class="text-gold-400 font-mono">46px</span>
+              <span class="text-gray-400">리뷰 헤드라인 글자 크기 (30px ~ 100px)</span>
+              <span id="quoteSizeVal" class="text-gold-400 font-mono">48px</span>
             </div>
-            <input type="range" id="quoteSizeSlider" min="24" max="72" value="46" class="w-full accent-gold-400 cursor-pointer">
+            <input type="range" id="quoteSizeSlider" min="30" max="100" value="48" class="w-full accent-gold-400 cursor-pointer">
           </div>
 
           <div class="grid grid-cols-2 gap-2 pt-1">
@@ -277,21 +296,38 @@
           </div>
         </div>
 
-        <div class="bg-cinema-850 p-3 rounded-xl border border-cinema-700 space-y-2">
+        <!-- Advanced Legibility & Background Mask Effects -->
+        <div class="bg-cinema-850 p-3 rounded-xl border border-cinema-700 space-y-3">
           <div class="flex justify-between text-xs font-bold text-gray-200">
-            <span>텍스트 가독성 마스크 (그라데이션)</span>
+            <span>텍스트 가독성 마스크 & 감싸기 효과</span>
             <span id="maskOpacityValue" class="text-gold-400 font-mono">75%</span>
           </div>
-          <input type="range" id="maskOpacitySlider" min="20" max="95" value="75" class="w-full accent-gold-400 cursor-pointer">
-          <div class="flex gap-4 pt-1 text-xs">
-            <label class="flex items-center gap-1.5 text-gray-300 cursor-pointer">
-              <input type="checkbox" id="checkVignette" checked class="accent-gold-400"> 비네팅 테두리
+          <input type="range" id="maskOpacitySlider" min="10" max="100" value="75" class="w-full accent-gold-400 cursor-pointer">
+
+          <div class="grid grid-cols-2 gap-2 pt-1 text-xs">
+            <label class="flex items-center gap-1.5 text-gray-300 cursor-pointer bg-cinema-900/60 p-2 rounded border border-cinema-700/60 hover:border-gold-500/50">
+              <input type="checkbox" id="checkDualFade" checked class="accent-gold-400"> 
+              <span>상하단 듀얼 페이드</span>
             </label>
-            <label class="flex items-center gap-1.5 text-gray-300 cursor-pointer">
-              <input type="checkbox" id="checkDualFade" checked class="accent-gold-400"> 상하단 듀얼 페이드
+            <label class="flex items-center gap-1.5 text-gray-300 cursor-pointer bg-cinema-900/60 p-2 rounded border border-cinema-700/60 hover:border-gold-500/50">
+              <input type="checkbox" id="checkVignette" checked class="accent-gold-400"> 
+              <span>비네팅 테두리</span>
+            </label>
+            <label class="flex items-center gap-1.5 text-gray-300 cursor-pointer bg-cinema-900/60 p-2 rounded border border-cinema-700/60 hover:border-gold-500/50">
+              <input type="checkbox" id="checkBoxBackdrop" class="accent-gold-400"> 
+              <span>글자 감싸는 박스 띠지</span>
+            </label>
+            <label class="flex items-center gap-1.5 text-gray-300 cursor-pointer bg-cinema-900/60 p-2 rounded border border-cinema-700/60 hover:border-gold-500/50">
+              <input type="checkbox" id="checkTextGlow" class="accent-gold-400"> 
+              <span>텍스트 외곽 글로우</span>
+            </label>
+            <label class="flex items-center gap-1.5 text-gray-300 cursor-pointer bg-cinema-900/60 p-2 rounded border border-cinema-700/60 hover:border-gold-500/50 col-span-2">
+              <input type="checkbox" id="checkSpotlight" class="accent-gold-400"> 
+              <span>글자 주위 다크 스포트라이트 (원형 블러)</span>
             </label>
           </div>
         </div>
+
       </div>
 
       <!-- Left Bottom Reset -->
@@ -362,7 +398,7 @@
   <script>
     const state = {
       projectTitle: "",
-      ratio: 'landscape', // 기본을 가로형으로 설정
+      ratio: 'landscape',
       dimensions: {
         landscape: { width: 1280, height: 720, label: '1280 × 720 px' },
         poster: { width: 1000, height: 1500, label: '1000 × 1500 px' },
@@ -379,9 +415,12 @@
         maskOpacity: 0.75,
         vignette: true,
         dualFade: true,
-        quoteSize: 46,
+        boxBackdrop: false,     // 텍스트 감싸는 박스 띠지
+        textGlow: false,        // 텍스트 외곽 글로우 효과
+        spotlight: false,       // 텍스트 주위 다크 스포트라이트
+        quoteSize: 48,          // 30 ~ 100
         accentColor: '#fbbf24',
-        decoration: 'none' // 별점 기본 노출 끔
+        decoration: 'none'
       },
       currentIndex: 0,
       searchQuery: '',
@@ -390,7 +429,7 @@
     };
 
     const DB_NAME = 'CineQuoteStudioDB_Clean';
-    const DB_VERSION = 2;
+    const DB_VERSION = 3;
     const STORE_NAME = 'projects';
 
     function openDatabase() {
@@ -498,7 +537,7 @@
         state.projectTitle = saved.projectTitle || "";
         state.ratio = saved.ratio || 'landscape';
         state.common = saved.common || { festivalBadge: "", credits: "" };
-        state.style = saved.style || state.style;
+        state.style = Object.assign(state.style, saved.style || {});
         state.currentIndex = saved.currentIndex || 0;
 
         topMovieTitle.value = state.projectTitle;
@@ -537,8 +576,13 @@
       document.getElementById('quoteSizeVal').innerText = state.style.quoteSize + 'px';
       document.getElementById('maskOpacitySlider').value = Math.round(state.style.maskOpacity * 100);
       document.getElementById('maskOpacityValue').innerText = Math.round(state.style.maskOpacity * 100) + '%';
+      
       document.getElementById('checkVignette').checked = state.style.vignette;
       document.getElementById('checkDualFade').checked = state.style.dualFade;
+      document.getElementById('checkBoxBackdrop').checked = state.style.boxBackdrop || false;
+      document.getElementById('checkTextGlow').checked = state.style.textGlow || false;
+      document.getElementById('checkSpotlight').checked = state.style.spotlight || false;
+
       document.getElementById('accentColorPicker').value = state.style.accentColor;
       document.getElementById('decoSelect').value = state.style.decoration;
 
@@ -583,6 +627,7 @@
         ctx.fillRect(0, 0, dim.width, dim.height);
       }
 
+      // Base Cinematic Masks
       applyCinematicMasks(ctx, dim.width, dim.height);
 
       if (state.common.festivalBadge && state.common.festivalBadge.trim() !== '') {
@@ -677,7 +722,48 @@
       } else if (valign === 'middle') {
         startY = h * 0.44;
       } else {
-        startY = state.ratio === 'landscape' ? h * 0.50 : h * 0.61;
+        startY = state.ratio === 'landscape' ? h * 0.48 : h * 0.60;
+      }
+
+      const maxLineWidth = w * 0.84;
+      ctx.font = `900 ${fontSize}px ${quoteFont}`;
+      const lines = wrapKoreanText(ctx, card.quote || '', maxLineWidth);
+      const lineHeight = fontSize * 1.34;
+      const totalBlockHeight = (lines.length * lineHeight) + (card.byline ? 36 : 0);
+
+      // Effect 1: 글자 주위 다크 스포트라이트 (원형 블러 마스크)
+      if (state.style.spotlight) {
+        ctx.save();
+        const spotRadius = Math.max(w * 0.45, totalBlockHeight * 1.4);
+        const spotGrad = ctx.createRadialGradient(w / 2, startY + (totalBlockHeight / 2) - 10, 20, w / 2, startY + (totalBlockHeight / 2) - 10, spotRadius);
+        spotGrad.addColorStop(0, `rgba(5, 7, 10, ${Math.min(0.95, state.style.maskOpacity * 1.1)})`);
+        spotGrad.addColorStop(0.7, `rgba(5, 7, 10, ${state.style.maskOpacity * 0.6})`);
+        spotGrad.addColorStop(1, 'rgba(5, 7, 10, 0)');
+        ctx.fillStyle = spotGrad;
+        ctx.fillRect(0, 0, w, h);
+        ctx.restore();
+      }
+
+      // Effect 2: 글자 감싸는 박스 띠지 (텍스트 뒤 라운드 플레이트)
+      if (state.style.boxBackdrop && lines.length > 0) {
+        ctx.save();
+        let maxW = 0;
+        lines.forEach(l => {
+          const lw = ctx.measureText(l).width;
+          if (lw > maxW) maxW = lw;
+        });
+        const padX = fontSize * 0.7;
+        const padY = fontSize * 0.4;
+        const boxW = Math.min(w * 0.92, maxW + (padX * 2));
+        const boxH = totalBlockHeight + (padY * 2);
+        const boxX = (w - boxW) / 2;
+        const boxY = startY - fontSize - padY + 12;
+
+        ctx.fillStyle = `rgba(10, 14, 22, ${Math.min(0.92, state.style.maskOpacity * 1.05)})`;
+        ctx.strokeStyle = 'rgba(251, 191, 36, 0.25)';
+        ctx.lineWidth = 1;
+        roundRect(ctx, boxX, boxY, boxW, boxH, 12, true, true);
+        ctx.restore();
       }
 
       // 장식 옵션
@@ -699,18 +785,21 @@
 
       let startX = w / 2;
       ctx.textAlign = align;
-      if (align === 'left') startX = w * 0.1;
-      if (align === 'right') startX = w * 0.9;
+      if (align === 'left') startX = w * 0.08;
+      if (align === 'right') startX = w * 0.92;
 
-      const maxLineWidth = w * 0.84;
       ctx.font = `900 ${fontSize}px ${quoteFont}`;
-      ctx.fillStyle = '#ffffff';
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
-      ctx.shadowBlur = 18;
-      ctx.shadowOffsetY = 4;
 
-      const lines = wrapKoreanText(ctx, card.quote || '', maxLineWidth);
-      const lineHeight = fontSize * 1.36;
+      // Effect 3: 텍스트 외곽 글로우 / 하이라이트
+      if (state.style.textGlow) {
+        ctx.shadowColor = state.style.accentColor;
+        ctx.shadowBlur = 28;
+        ctx.shadowOffsetY = 0;
+      } else {
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.98)';
+        ctx.shadowBlur = 18;
+        ctx.shadowOffsetY = 4;
+      }
 
       lines.forEach((line, idx) => {
         const lineY = startY + (idx * lineHeight);
@@ -719,15 +808,32 @@
       });
 
       if (card.byline) {
-        const bylineY = startY + (lines.length * lineHeight) + 20;
+        const bylineY = startY + (lines.length * lineHeight) + 24;
         ctx.shadowBlur = 8;
-        ctx.font = '500 18px "Noto Sans KR", sans-serif';
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
+        ctx.font = '500 20px "Noto Sans KR", sans-serif';
         ctx.fillStyle = '#cbd5e1';
         ctx.letterSpacing = '1px';
         ctx.fillText(card.byline, startX, bylineY);
       }
 
       ctx.restore();
+    }
+
+    function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + width - radius, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+      ctx.lineTo(x + width, y + height - radius);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      ctx.lineTo(x + radius, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+      if (fill) ctx.fill();
+      if (stroke) ctx.stroke();
     }
 
     function wrapKoreanText(ctx, text, maxWidth) {
@@ -788,6 +894,7 @@
     }
 
     let cardToReplaceImageIndex = null;
+    let draggedIndex = null;
 
     function renderCardsList() {
       cardsListContainer.innerHTML = '';
@@ -816,7 +923,55 @@
       filteredCards.forEach(({ card, originalIndex }) => {
         const isCurrent = originalIndex === state.currentIndex;
         const cardEl = document.createElement('div');
-        cardEl.className = `p-3 rounded-xl border transition space-y-2.5 ${isCurrent ? 'bg-cinema-800/90 border-gold-400 ring-1 ring-gold-400/40' : 'bg-cinema-850/80 border-cinema-700/80 hover:border-cinema-600'}`;
+        cardEl.draggable = true;
+        cardEl.dataset.index = originalIndex;
+        cardEl.className = `draggable-card p-3 rounded-xl border transition space-y-2.5 ${isCurrent ? 'bg-cinema-800/90 border-gold-400 ring-1 ring-gold-400/40' : 'bg-cinema-850/80 border-cinema-700/80 hover:border-cinema-600'}`;
+
+        // Drag & Drop Listeners
+        cardEl.addEventListener('dragstart', (e) => {
+          draggedIndex = originalIndex;
+          cardEl.classList.add('dragging');
+          e.dataTransfer.effectAllowed = 'move';
+        });
+
+        cardEl.addEventListener('dragend', () => {
+          cardEl.classList.remove('dragging');
+          document.querySelectorAll('.draggable-card').forEach(el => el.classList.remove('drag-over'));
+        });
+
+        cardEl.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'move';
+          cardEl.classList.add('drag-over');
+        });
+
+        cardEl.addEventListener('dragleave', () => {
+          cardEl.classList.remove('drag-over');
+        });
+
+        cardEl.addEventListener('drop', (e) => {
+          e.preventDefault();
+          cardEl.classList.remove('drag-over');
+          if (draggedIndex === null || draggedIndex === originalIndex) return;
+
+          // Reorder array
+          const moved = state.cards.splice(draggedIndex, 1)[0];
+          state.cards.splice(originalIndex, 0, moved);
+
+          if (state.currentIndex === draggedIndex) {
+            state.currentIndex = originalIndex;
+          } else if (draggedIndex < state.currentIndex && originalIndex >= state.currentIndex) {
+            state.currentIndex--;
+          } else if (draggedIndex > state.currentIndex && originalIndex <= state.currentIndex) {
+            state.currentIndex++;
+          }
+
+          renderCardsList();
+          renderCurrentCard();
+          saveStateToStorage();
+          showToast(`카드 순서가 변경되었습니다. (#${draggedIndex + 1} → #${originalIndex + 1})`);
+          draggedIndex = null;
+        });
 
         const imgTag = card.imageSrc 
           ? `<img src="${card.imageSrc}" class="w-full h-full object-cover group-hover:scale-105 transition">`
@@ -824,21 +979,16 @@
 
         cardEl.innerHTML = `
           <div class="flex items-center justify-between gap-2">
-            <div class="flex items-center gap-2">
-              <span class="w-6 h-6 rounded bg-cinema-900 border border-cinema-700 text-gold-400 font-bold text-xs flex items-center justify-center font-mono">
+            <div class="flex items-center gap-2 cursor-grab active:cursor-grabbing">
+              <i data-lucide="grip-vertical" class="w-4 h-4 text-gray-500 hover:text-gold-400"></i>
+              <span class="w-5 h-5 rounded bg-cinema-900 border border-cinema-700 text-gold-400 font-bold text-xs flex items-center justify-center font-mono">
                 ${originalIndex + 1}
               </span>
               <span class="text-xs font-semibold text-gray-300">카드 #${originalIndex + 1}</span>
             </div>
 
             <div class="flex items-center gap-1">
-              <button onclick="moveCard(${originalIndex}, -1)" ${originalIndex === 0 ? 'disabled' : ''} class="p-1 rounded hover:bg-cinema-700 text-gray-400 hover:text-white disabled:opacity-30 disabled:hover:bg-transparent" title="위로 이동">
-                <i data-lucide="chevron-up" class="w-4 h-4"></i>
-              </button>
-              <button onclick="moveCard(${originalIndex}, 1)" ${originalIndex === state.cards.length - 1 ? 'disabled' : ''} class="p-1 rounded hover:bg-cinema-700 text-gray-400 hover:text-white disabled:opacity-30 disabled:hover:bg-transparent" title="아래로 이동">
-                <i data-lucide="chevron-down" class="w-4 h-4"></i>
-              </button>
-              <button onclick="triggerImageReplace(${originalIndex})" class="p-1 rounded hover:bg-cinema-700 text-amber-400 hover:text-amber-300 ml-1" title="스틸 이미지 교체">
+              <button onclick="triggerImageReplace(${originalIndex})" class="p-1 rounded hover:bg-cinema-700 text-amber-400 hover:text-amber-300" title="스틸 이미지 교체">
                 <i data-lucide="image" class="w-4 h-4"></i>
               </button>
               <button onclick="deleteCard(${originalIndex})" class="p-1 rounded hover:bg-cinema-700 text-red-400 hover:text-red-300" title="카드 삭제">
@@ -898,26 +1048,6 @@
       state.currentIndex = index;
       renderCardsList();
       renderCurrentCard();
-    };
-
-    window.moveCard = function(index, direction) {
-      const targetIndex = index + direction;
-      if (targetIndex < 0 || targetIndex >= state.cards.length) return;
-
-      const temp = state.cards[index];
-      state.cards[index] = state.cards[targetIndex];
-      state.cards[targetIndex] = temp;
-
-      if (state.currentIndex === index) {
-        state.currentIndex = targetIndex;
-      } else if (state.currentIndex === targetIndex) {
-        state.currentIndex = index;
-      }
-
-      renderCardsList();
-      renderCurrentCard();
-      saveStateToStorage();
-      showToast(`카드 #${index + 1} 순서가 변경되었습니다.`);
     };
 
     window.deleteCard = function(index) {
@@ -1118,7 +1248,7 @@
       });
     }
 
-    // 개선된 스마트 문구 파서 (단순 줄바꿈 연속 입력 완벽 대응)
+    // 스마트 문구 파서
     document.getElementById('btnParseReviews').addEventListener('click', () => {
       const raw = bulkQuotesInput.value.trim();
       if (!raw) {
@@ -1126,12 +1256,10 @@
         return;
       }
 
-      // 빈 줄 기준으로 먼저 덩어리가 나뉘어 있는지 검사
       let blocks = raw.split(/\n\s*\n/).map(b => b.trim()).filter(Boolean);
       const parsed = [];
 
       if (blocks.length > 1) {
-        // 빈 줄로 묶음이 명확히 구분된 경우
         blocks.forEach(block => {
           const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
           if (lines.length === 1) {
@@ -1141,7 +1269,6 @@
           }
         });
       } else {
-        // 빈 줄 없이 연속으로 줄바꿈만 입력된 경우 (화면 입력 방식 대응)
         const lines = raw.split('\n').map(l => l.trim()).filter(Boolean);
         for (let i = 0; i < lines.length; i += 2) {
           const quote = lines[i];
@@ -1155,7 +1282,6 @@
         return;
       }
 
-      // 기존 카드가 있으면 내용 업데이트, 없으면 새 카드 생성
       parsed.forEach((item, idx) => {
         if (state.cards[idx]) {
           state.cards[idx].quote = item.quote;
@@ -1234,18 +1360,23 @@
       renderCurrentCard();
       saveStateToStorage();
     };
+    
+    // 30 ~ 100px Slider Event
     document.getElementById('quoteSizeSlider').oninput = (e) => {
       state.style.quoteSize = e.target.value;
       document.getElementById('quoteSizeVal').innerText = e.target.value + 'px';
       renderCurrentCard();
       saveStateToStorage();
     };
+
     document.getElementById('maskOpacitySlider').oninput = (e) => {
       state.style.maskOpacity = e.target.value / 100;
       document.getElementById('maskOpacityValue').innerText = e.target.value + '%';
       renderCurrentCard();
       saveStateToStorage();
     };
+    
+    // Mask Checkbox Listeners
     document.getElementById('checkVignette').onchange = (e) => {
       state.style.vignette = e.target.checked;
       renderCurrentCard();
@@ -1256,6 +1387,22 @@
       renderCurrentCard();
       saveStateToStorage();
     };
+    document.getElementById('checkBoxBackdrop').onchange = (e) => {
+      state.style.boxBackdrop = e.target.checked;
+      renderCurrentCard();
+      saveStateToStorage();
+    };
+    document.getElementById('checkTextGlow').onchange = (e) => {
+      state.style.textGlow = e.target.checked;
+      renderCurrentCard();
+      saveStateToStorage();
+    };
+    document.getElementById('checkSpotlight').onchange = (e) => {
+      state.style.spotlight = e.target.checked;
+      renderCurrentCard();
+      saveStateToStorage();
+    };
+
     document.getElementById('accentColorPicker').oninput = (e) => {
       state.style.accentColor = e.target.value;
       renderCurrentCard();
